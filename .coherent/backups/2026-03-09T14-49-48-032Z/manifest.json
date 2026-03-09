@@ -1,0 +1,23 @@
+{
+  "timestamp": "2026-03-09T14:49:48.038Z",
+  "message": "Update home page: change hero CTA buttons to an inline terminal command 'npm install -g @coherent/cli' with copy button and an outline 'View on GitHub' button linking to https://github.com/coherent-design/coherent. Keep everything else as is.",
+  "files": [
+    "design-system.config.ts",
+    "app/layout.tsx",
+    "app/design-system/components/[id]/page.tsx",
+    "app/design-system/components/page.tsx",
+    "app/design-system/docs/page.tsx",
+    "app/design-system/page.tsx",
+    "app/design-system/recommendations/page.tsx",
+    "app/design-system/shared/[id]/page.tsx",
+    "app/design-system/shared/page.tsx",
+    "app/design-system/sitemap/page.tsx",
+    "app/design-system/tokens/colors/page.tsx",
+    "app/design-system/tokens/page.tsx",
+    "app/design-system/tokens/spacing/page.tsx",
+    "app/design-system/tokens/typography/page.tsx",
+    "app/page.tsx",
+    "components/shared/footer.tsx",
+    "components/shared/header.tsx"
+  ]
+}
