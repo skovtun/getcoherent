@@ -1,0 +1,23 @@
+{
+  "timestamp": "2026-03-09T17:52:41.645Z",
+  "message": "цвет шрифта кода в инпутах должен быть везде одинаковый, как в hero секции. Добавь кнопку копировать в инпуты с кодом",
+  "files": [
+    "design-system.config.ts",
+    "app/layout.tsx",
+    "app/design-system/components/[id]/page.tsx",
+    "app/design-system/components/page.tsx",
+    "app/design-system/docs/page.tsx",
+    "app/design-system/page.tsx",
+    "app/design-system/recommendations/page.tsx",
+    "app/design-system/shared/[id]/page.tsx",
+    "app/design-system/shared/page.tsx",
+    "app/design-system/sitemap/page.tsx",
+    "app/design-system/tokens/colors/page.tsx",
+    "app/design-system/tokens/page.tsx",
+    "app/design-system/tokens/spacing/page.tsx",
+    "app/design-system/tokens/typography/page.tsx",
+    "app/page.tsx",
+    "components/shared/footer.tsx",
+    "components/shared/header.tsx"
+  ]
+}

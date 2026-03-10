@@ -1,0 +1,60 @@
+{
+  "shared": [
+    {
+      "id": "CID-003",
+      "name": "CopyableInline",
+      "type": "widget",
+      "file": "components/copyable-terminal.tsx",
+      "usedIn": [
+        "app/page.tsx"
+      ],
+      "createdAt": "2026-03-10T02:26:00.592Z",
+      "description": "Auto-detected from components/copyable-terminal.tsx"
+    },
+    {
+      "id": "CID-004",
+      "name": "CopyableBlock",
+      "type": "widget",
+      "file": "components/copyable-terminal.tsx",
+      "usedIn": [
+        "app/page.tsx"
+      ],
+      "createdAt": "2026-03-10T02:26:00.592Z",
+      "description": "Auto-detected from components/copyable-terminal.tsx"
+    },
+    {
+      "id": "CID-005",
+      "name": "ParticleDotGrid",
+      "type": "widget",
+      "file": "components/hero-effects.tsx",
+      "usedIn": [
+        "app/page.tsx"
+      ],
+      "createdAt": "2026-03-10T02:26:00.592Z",
+      "description": "Auto-detected from components/hero-effects.tsx"
+    },
+    {
+      "id": "CID-006",
+      "name": "FloatingSnippets",
+      "type": "widget",
+      "file": "components/hero-effects.tsx",
+      "usedIn": [
+        "app/page.tsx"
+      ],
+      "createdAt": "2026-03-10T02:26:00.592Z",
+      "description": "Auto-detected from components/hero-effects.tsx"
+    },
+    {
+      "id": "CID-007",
+      "name": "LandingNav",
+      "type": "layout",
+      "file": "components/landing-nav.tsx",
+      "usedIn": [
+        "app/page.tsx"
+      ],
+      "createdAt": "2026-03-10T02:26:00.592Z",
+      "description": "Auto-detected from components/landing-nav.tsx"
+    }
+  ],
+  "nextId": 8
+}
