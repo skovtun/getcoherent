@@ -1,17 +1,11 @@
 'use client'
 
-import { motion, useReducedMotion } from 'framer-motion'
 import { ArrowRight, Check, Search } from 'lucide-react'
 
 export function DesignSystemCard() {
-  const reduce = useReducedMotion()
-
   return (
-    <motion.div
-      initial={reduce ? false : { opacity: 0, y: 24, scale: 0.985 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{ duration: 0.7, delay: 0.2, ease: [0.25, 1, 0.5, 1] }}
-      className="overflow-hidden rounded-xl border border-[var(--border-strong)] bg-[var(--surface)] shadow-[0_40px_100px_-40px_rgba(0,0,0,0.7)]"
+    <div
+      className="overflow-hidden rounded-xl border border-[var(--border-strong)] bg-[var(--surface)] shadow-[0_24px_60px_-30px_rgba(0,0,0,0.4)]"
     >
       {/* frame header */}
       <div className="flex items-center justify-between border-b border-[var(--border)] bg-[var(--surface-2)] px-4 py-2.5">
@@ -108,36 +102,27 @@ export function DesignSystemCard() {
           <section className="grid grid-cols-2 items-start gap-3">
             <div>
               <SectionLabel>spacing · 4pt</SectionLabel>
-              <div className="mt-2 flex items-end gap-1 rounded-md border border-[var(--border)] bg-[var(--elevated)] px-2.5 py-2">
+              <div className="mt-2 flex items-center justify-between gap-2 rounded-md border border-[var(--border)] bg-[var(--elevated)] px-3 py-3">
                 {[4, 8, 12, 16, 20, 24, 32].map((v) => (
-                  <div key={v} className="flex flex-col items-center gap-1">
-                    <div
-                      className="w-2.5 rounded-sm bg-[var(--accent)]/60"
-                      style={{ height: `${v}px` }}
-                    />
-                    <span className="mono text-[8px] text-[var(--fg-dim)]">{v}</span>
-                  </div>
+                  <span
+                    key={v}
+                    className="mono text-[10px] tabular-nums text-[var(--fg-dim)]"
+                  >
+                    {v}
+                  </span>
                 ))}
               </div>
             </div>
             <div>
               <SectionLabel>radius</SectionLabel>
-              <div className="mt-2 flex items-center gap-2 rounded-md border border-[var(--border)] bg-[var(--elevated)] px-2.5 py-2">
-                {[
-                  { label: 'sm', r: 2 },
-                  { label: 'md', r: 6 },
-                  { label: 'lg', r: 8 },
-                  { label: 'xl', r: 12 },
-                ].map((r) => (
-                  <div key={r.label} className="flex flex-col items-center gap-1">
-                    <div
-                      className="h-8 w-8 bg-[var(--accent)]/30"
-                      style={{ borderRadius: `${r.r}px` }}
-                    />
-                    <span className="mono text-[8px] text-[var(--fg-dim)]">
-                      {r.label}
-                    </span>
-                  </div>
+              <div className="mt-2 flex items-center justify-between gap-2 rounded-md border border-[var(--border)] bg-[var(--elevated)] px-3 py-3">
+                {['sm', 'md', 'lg', 'xl'].map((label) => (
+                  <span
+                    key={label}
+                    className="mono text-[10px] text-[var(--fg-dim)]"
+                  >
+                    {label}
+                  </span>
                 ))}
               </div>
             </div>
@@ -239,7 +224,7 @@ export function DesignSystemCard() {
           every value editable
         </span>
       </div>
-    </motion.div>
+    </div>
   )
 }
 

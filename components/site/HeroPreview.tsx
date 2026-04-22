@@ -1,6 +1,7 @@
 'use client'
 
 import { motion, useReducedMotion, AnimatePresence } from 'framer-motion'
+import { Pause, Play } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { DesignSystemCard } from './DesignSystemCard'
 import { TraceConsole } from './TraceConsole'
@@ -81,28 +82,30 @@ export function HeroPreview() {
           className="pointer-events-none absolute inset-0 z-20 h-full w-full overflow-visible"
         >
           <rect
+            key={index}
             x="0.5"
             y="0.5"
             width="calc(100% - 1px)"
             height="calc(100% - 1px)"
-            rx="11.75"
-            ry="11.75"
+            rx="15.5"
+            ry="15.5"
             fill="none"
-            stroke="var(--accent)"
-            strokeWidth="1"
+            stroke="var(--runner-stroke)"
+            strokeWidth="1.25"
             strokeLinecap="round"
             pathLength="100"
             strokeDasharray="100"
+            strokeDashoffset="100"
             style={{
-              opacity: 0.5,
-              filter: 'drop-shadow(0 0 2px rgba(62, 207, 142, 0.2))',
+              opacity: 0.9,
+              filter: 'drop-shadow(0 0 2px var(--runner-glow))',
               animationName: reducedMotion
                 ? 'none'
                 : 'runner-trace, runner-pulse',
               animationDuration: `${AUTO_ADVANCE_MS}ms, 1.4s`,
               animationTimingFunction: 'linear, ease-in-out',
               animationIterationCount: 'infinite, infinite',
-              animationDelay: '1s, 0s',
+              animationDelay: '0.45s, 0s',
               animationPlayState: paused
                 ? 'paused, running'
                 : 'running, paused',
@@ -121,10 +124,10 @@ export function HeroPreview() {
         <AnimatePresence mode="wait" initial={false}>
           <motion.div
             key={current.id}
-            initial={reduce ? false : { opacity: 0, x: 12 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={reduce ? undefined : { opacity: 0, x: -12 }}
-            transition={{ duration: 0.35, ease: [0.25, 1, 0.5, 1] }}
+            initial={reduce ? false : { opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={reduce ? undefined : { opacity: 0, y: -12 }}
+            transition={{ duration: 0.4, ease: [0.25, 1, 0.5, 1] }}
           >
             {current.id === 'ui' ? <GeneratedUISlide /> : <DesignSystemSlide />}
           </motion.div>
@@ -135,14 +138,34 @@ export function HeroPreview() {
       <div className="mono mt-5 flex flex-wrap items-center justify-between gap-3 text-[12px] text-[var(--fg-dim)]">
         <span>{current.caption}</span>
         <span className="inline-flex items-center gap-1.5 text-[11px] text-[var(--fg-dim)]">
-          <span
-            className={`inline-block h-1.5 w-1.5 rounded-full ${paused ? 'bg-[var(--fg-dim)]' : 'bg-[var(--accent)]'}`}
-          />
+          {paused ? (
+            <Pause
+              size={10}
+              strokeWidth={2.2}
+              className="text-[var(--fg-dim)]"
+              aria-hidden
+            />
+          ) : (
+            <Play
+              size={10}
+              strokeWidth={2.2}
+              className="text-[var(--accent)]"
+              aria-hidden
+            />
+          )}
           {paused ? 'paused' : 'auto-advancing'} · hover to pause
         </span>
       </div>
 
       <style jsx global>{`
+        :root {
+          --runner-stroke: #0f7f48;
+          --runner-glow: rgba(15, 127, 72, 0.45);
+        }
+        .dark {
+          --runner-stroke: #3ecf8e;
+          --runner-glow: rgba(62, 207, 142, 0.28);
+        }
         @keyframes runner-trace {
           from {
             stroke-dashoffset: 100;
@@ -154,10 +177,10 @@ export function HeroPreview() {
         @keyframes runner-pulse {
           0%,
           100% {
-            opacity: 0.5;
+            opacity: 0.95;
           }
           50% {
-            opacity: 0.22;
+            opacity: 0.3;
           }
         }
       `}</style>
@@ -167,7 +190,7 @@ export function HeroPreview() {
 
 function GeneratedUISlide() {
   return (
-    <div className="overflow-hidden rounded-xl border border-[var(--border-strong)] bg-[var(--surface)] shadow-[0_40px_100px_-40px_rgba(0,0,0,0.7)]">
+    <div className="overflow-hidden rounded-xl border border-[var(--border-strong)] bg-[var(--surface)] shadow-[0_24px_60px_-30px_rgba(0,0,0,0.4)]">
       <div className="flex items-center justify-between border-b border-[var(--border)] bg-[var(--surface-2)] px-4 py-2.5">
         <div className="flex items-center gap-1.5">
           <span className="h-2.5 w-2.5 rounded-full bg-[var(--border-strong)]" />
