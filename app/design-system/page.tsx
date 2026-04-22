@@ -1,6 +1,7 @@
 'use client'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
+import { ArrowRight } from 'lucide-react'
 
 interface Change {
   type: string
@@ -20,14 +21,32 @@ function timeAgo(iso: string): string {
   return new Date(iso).toLocaleDateString()
 }
 
-const typeIcons: Record<string, string> = {
-  'add-page': '📄',
-  'modify-page': '✏️',
-  'add-component': '🧩',
-  'modify-component': '🔧',
-  'modify-tokens': '🎨',
-  'modify-config': '⚙️',
-  init: '🚀',
+const TYPE_LABELS: Record<string, string> = {
+  'add-page': 'PAGE',
+  'modify-page': 'PAGE',
+  'add-component': 'COMP',
+  'modify-component': 'COMP',
+  'modify-tokens': 'TOKEN',
+  'modify-config': 'CONFIG',
+  init: 'INIT',
+}
+
+const TYPE_TONE: Record<string, string> = {
+  'add-page': 'text-[var(--accent)]',
+  'modify-page': 'text-[var(--fg-muted)]',
+  'add-component': 'text-[var(--accent)]',
+  'modify-component': 'text-[var(--fg-muted)]',
+  'modify-tokens': 'text-[#e5c07b]',
+  'modify-config': 'text-[var(--fg-muted)]',
+  init: 'text-[var(--accent)]',
+}
+
+function SectionLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="mono mb-2 text-[10px] uppercase tracking-[0.16em] text-[var(--fg-dim)]">
+      {children}
+    </div>
+  )
 }
 
 function activityLevel(changes: Change[]): { total: number; days: Map<string, number> } {
@@ -77,7 +96,8 @@ export default function DesignSystemPage() {
     d.setDate(d.getDate() - (totalDays - 1 - i))
     return d.toISOString().slice(0, 10)
   })
-  const countToLevel = (count: number) => (count === 0 ? 0 : Math.min(4, Math.ceil(count / 3)))
+  const countToLevel = (count: number) =>
+    count === 0 ? 0 : Math.min(4, Math.ceil(count / 3))
   const weeks = 52
   const rows = 7
   const monthLabel = (col: number) => {
@@ -86,175 +106,254 @@ export default function DesignSystemPage() {
     if (!day) return ''
     const d = new Date(day + 'T12:00:00')
     if (d.getDate() > 7) return ''
-    return d.toLocaleDateString(undefined, { month: 'short' })
+    return d.toLocaleDateString(undefined, { month: 'short' }).toLowerCase()
   }
+
+  const summary = [
+    {
+      href: '/design-system/components',
+      label: 'components',
+      value: components.length,
+      hint: 'view all',
+    },
+    {
+      href: '/design-system/shared',
+      label: 'shared',
+      value: sharedCount,
+      hint: 'header · footer · etc',
+    },
+    {
+      href: '/design-system/tokens',
+      label: 'tokens',
+      value: tokenTotal,
+      hint: 'colors · spacing · radius',
+    },
+    {
+      href: '/design-system/sitemap',
+      label: 'pages',
+      value: pages.length,
+      hint: 'sitemap & analysis',
+    },
+  ]
+
+  const quickLinks = [
+    {
+      href: '/design-system/components',
+      label: 'Components',
+      meta: String(components.length),
+    },
+    {
+      href: '/design-system/shared',
+      label: 'Shared Components',
+      meta: String(sharedCount),
+    },
+    {
+      href: '/design-system/tokens/colors',
+      label: 'Colors',
+      meta: `${colorCount}`,
+      swatches: true,
+    },
+    { href: '/design-system/tokens/typography', label: 'Typography', meta: '' },
+    {
+      href: '/design-system/tokens/spacing',
+      label: 'Spacing & Radius',
+      meta: `${spacingCount + radiusCount}`,
+    },
+    { href: '/design-system/docs', label: 'Documentation', meta: '' },
+    { href: '/design-system/recommendations', label: 'Recommendations', meta: '' },
+  ]
 
   return (
     <div className="flex flex-col gap-6">
+      {/* HEADER */}
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">Design System</h1>
-        <p className="text-sm text-muted-foreground">
-          Overview of your project's components, tokens, and recent activity.
+        <h1 className="text-[28px] font-medium leading-tight tracking-[-0.02em] text-[var(--foreground)]">
+          Design System
+        </h1>
+        <p className="mt-1 text-[13.5px] text-[var(--fg-muted)]">
+          Components, tokens, and recent activity — for this project.
         </p>
       </div>
 
-      {/* Summary cards: Components, Shared, Tokens, Documentation (no separate Pages/Changes) */}
-      <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
-        <Link href="/design-system/components" className="rounded-lg border p-4 hover:border-primary transition-colors">
-          <div className="text-2xl font-bold">{components.length}</div>
-          <div className="text-sm text-muted-foreground">Components</div>
-          <div className="text-xs text-muted-foreground mt-1">View all →</div>
-        </Link>
-        <Link href="/design-system/shared" className="rounded-lg border p-4 hover:border-primary transition-colors">
-          <div className="text-2xl font-bold">{sharedCount}</div>
-          <div className="text-sm text-muted-foreground">Shared Components</div>
-          <div className="text-xs text-muted-foreground mt-1">Header, Footer, etc. →</div>
-        </Link>
-        <Link href="/design-system/tokens" className="rounded-lg border p-4 hover:border-primary transition-colors">
-          <div className="text-2xl font-bold">{tokenTotal}</div>
-          <div className="text-sm text-muted-foreground">Tokens</div>
-          <div className="text-xs text-muted-foreground mt-1">Colors · Spacing · Radius</div>
-        </Link>
-        <Link href="/design-system/sitemap" className="rounded-lg border p-4 hover:border-primary transition-colors">
-          <div className="text-2xl font-bold">{pages.length}</div>
-          <div className="text-sm text-muted-foreground">Pages</div>
-          <div className="text-xs text-muted-foreground mt-1">Sitemap & analysis →</div>
-        </Link>
+      {/* SUMMARY CARDS */}
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+        {summary.map((s) => (
+          <Link
+            key={s.href}
+            href={s.href}
+            className="press group rounded-md border border-[var(--border-strong)] bg-[var(--surface)] p-4 outline-none transition-colors hover:border-[var(--accent-dim)] hover:bg-[var(--surface-2)]"
+          >
+            <div className="mono text-[10px] uppercase tracking-[0.16em] text-[var(--fg-dim)]">
+              {s.label}
+            </div>
+            <div className="mt-1.5 flex items-baseline gap-2">
+              <span className="mono text-[28px] font-medium leading-none tracking-tight tabular-nums text-[var(--foreground)]">
+                {s.value}
+              </span>
+            </div>
+            <div className="mono mt-2 flex items-center justify-between text-[10.5px] text-[var(--fg-dim)]">
+              <span>{s.hint}</span>
+              <ArrowRight
+                size={11}
+                strokeWidth={2}
+                className="transition-transform duration-150 group-hover:translate-x-0.5 group-hover:text-[var(--accent)]"
+              />
+            </div>
+          </Link>
+        ))}
       </div>
 
-      {/* Activity heatmap (last year) — GitHub-style grid, contained so it never overflows screen */}
-      <div className="rounded-lg border p-3 sm:p-4 w-full max-w-full overflow-hidden">
-        <h2 className="text-sm font-medium mb-2 sm:mb-3">Activity (last year)</h2>
-        <div className="w-full max-w-full overflow-x-auto overflow-y-hidden pb-1">
-          <div className="flex gap-0.5 sm:gap-1 text-[10px] text-muted-foreground mb-1 min-w-0">
+      {/* ACTIVITY HEATMAP */}
+      <div className="rounded-md border border-[var(--border-strong)] bg-[var(--surface)] p-4">
+        <div className="mb-3 flex items-center justify-between">
+          <SectionLabel>activity · last year</SectionLabel>
+          <span className="mono text-[10.5px] text-[var(--fg-dim)] tabular-nums">
+            {changes.length} events
+          </span>
+        </div>
+        <div className="w-full overflow-x-auto pb-1">
+          <div className="mono mb-1 flex min-w-0 gap-0.5 text-[9px] text-[var(--fg-dim)] sm:gap-1">
             {Array.from({ length: weeks }, (_, col) => (
-              <span key={col} className="shrink-0 w-2.5 min-w-2.5 sm:w-3 sm:min-w-3">{monthLabel(col)}</span>
+              <span key={col} className="w-2.5 min-w-2.5 shrink-0 sm:w-3 sm:min-w-3">
+                {monthLabel(col)}
+              </span>
             ))}
           </div>
-          <div className="flex items-start gap-0.5 sm:gap-1 min-w-0 touch-pan-x">
-          {Array.from({ length: weeks }, (_, col) => (
-            <div key={col} className="flex flex-col gap-0.5 shrink-0">
-              {Array.from({ length: rows }, (_, row) => {
-                const idx = col * rows + row
-                const day = last364[idx]
-                if (!day) return null
-                const count = actDays.get(day) ?? 0
-                const level = countToLevel(count)
-                return (
-                  <div
-                    key={day}
-                    className="size-2.5 min-w-2.5 sm:size-3 sm:min-w-3 rounded-[2px] sm:rounded-sm transition-colors"
-                    style={{
-                      backgroundColor:
-                        level === 0
-                          ? 'var(--muted)'
-                          : level === 1
-                            ? 'color-mix(in srgb, var(--primary) 25%, var(--muted))'
-                            : level === 2
-                              ? 'color-mix(in srgb, var(--primary) 50%, var(--muted))'
-                              : level === 3
-                                ? 'color-mix(in srgb, var(--primary) 75%, var(--muted))'
-                                : 'var(--primary)',
-                    }}
-                    title={`${day}: ${count} change${count === 1 ? '' : 's'}`}
-                  />
-                )
-              })}
-            </div>
-          ))}
+          <div className="flex min-w-0 items-start gap-0.5 touch-pan-x sm:gap-1">
+            {Array.from({ length: weeks }, (_, col) => (
+              <div key={col} className="flex shrink-0 flex-col gap-0.5">
+                {Array.from({ length: rows }, (_, row) => {
+                  const idx = col * rows + row
+                  const day = last364[idx]
+                  if (!day) return null
+                  const count = actDays.get(day) ?? 0
+                  const level = countToLevel(count)
+                  return (
+                    <div
+                      key={day}
+                      className="size-2.5 min-w-2.5 rounded-[2px] transition-colors sm:size-3 sm:min-w-3 sm:rounded-sm"
+                      style={{
+                        backgroundColor:
+                          level === 0
+                            ? 'var(--border)'
+                            : level === 1
+                              ? 'color-mix(in srgb, var(--accent) 25%, var(--border))'
+                              : level === 2
+                                ? 'color-mix(in srgb, var(--accent) 50%, var(--border))'
+                                : level === 3
+                                  ? 'color-mix(in srgb, var(--accent) 75%, var(--border))'
+                                  : 'var(--accent)',
+                      }}
+                      title={`${day}: ${count} change${count === 1 ? '' : 's'}`}
+                    />
+                  )
+                })}
+              </div>
+            ))}
           </div>
         </div>
-        <div className="flex items-center gap-2 mt-2 flex-shrink-0">
-          <span className="text-xs text-muted-foreground">Less</span>
+        <div className="mono mt-3 flex items-center gap-2 text-[10px] text-[var(--fg-dim)]">
+          <span>less</span>
           <div className="flex gap-0.5">
             {[0, 1, 2, 3, 4].map((i) => (
               <div
                 key={i}
-                className="size-2.5 sm:size-3 rounded-[2px] sm:rounded-sm shrink-0"
+                className="size-2.5 shrink-0 rounded-[2px] sm:size-3 sm:rounded-sm"
                 style={{
                   backgroundColor:
                     i === 0
-                      ? 'var(--muted)'
-                      : `color-mix(in srgb, var(--primary) ${i * 25}%, var(--muted))`,
+                      ? 'var(--border)'
+                      : `color-mix(in srgb, var(--accent) ${i * 25}%, var(--border))`,
                 }}
               />
             ))}
           </div>
-          <span className="text-xs text-muted-foreground">More</span>
+          <span>more</span>
         </div>
         {changes.length === 0 && (
-          <p className="text-xs text-muted-foreground mt-2">No activity yet. Run <code className="rounded bg-muted px-1">coherent chat</code> to start building.</p>
+          <p className="mono mt-3 text-[11px] text-[var(--fg-dim)]">
+            no activity yet · run{' '}
+            <code className="rounded border border-[var(--border-strong)] bg-[var(--elevated)] px-1.5 py-0.5 text-[var(--foreground)]">
+              coherent chat
+            </code>{' '}
+            to start
+          </p>
         )}
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        {/* Quick links */}
-        <div className="rounded-lg border p-4">
-          <h2 className="text-sm font-medium mb-3">Quick links</h2>
-          <div className="space-y-2">
-            <Link href="/design-system/components" className="flex items-center justify-between rounded-md px-3 py-2 text-sm hover:bg-muted transition-colors">
-              <span>Components ({components.length})</span>
-              <span className="text-xs text-muted-foreground">→</span>
-            </Link>
-            <Link href="/design-system/shared" className="flex items-center justify-between rounded-md px-3 py-2 text-sm hover:bg-muted transition-colors">
-              <span>Shared Components ({sharedCount})</span>
-              <span className="text-xs text-muted-foreground">→</span>
-            </Link>
-            <Link href="/design-system/tokens/colors" className="flex items-center justify-between rounded-md px-3 py-2 text-sm hover:bg-muted transition-colors">
-              <div className="flex items-center gap-2">
-                <span>Colors</span>
-                <div className="flex gap-0.5">
-                  <div className="size-3 rounded-sm bg-primary" />
-                  <div className="size-3 rounded-sm bg-secondary border" />
-                  <div className="size-3 rounded-sm bg-destructive" />
+      {/* TWO-COL — QUICK LINKS + RECENT CHANGES */}
+      <div className="grid gap-4 lg:grid-cols-2">
+        <div className="rounded-md border border-[var(--border-strong)] bg-[var(--surface)]">
+          <div className="border-b border-[var(--border)] px-4 py-3">
+            <SectionLabel>quick links</SectionLabel>
+          </div>
+          <div className="flex flex-col p-2">
+            {quickLinks.map((l) => (
+              <Link
+                key={l.href}
+                href={l.href}
+                className="press mono flex items-center justify-between rounded-md px-3 py-2 text-[12.5px] text-[var(--foreground)] outline-none transition-colors hover:bg-[var(--elevated)]"
+              >
+                <div className="flex items-center gap-2.5">
+                  <span>{l.label}</span>
+                  {l.swatches && (
+                    <div className="flex gap-0.5">
+                      <span className="h-2.5 w-2.5 rounded-sm bg-[var(--accent)]" />
+                      <span className="h-2.5 w-2.5 rounded-sm border border-[var(--border-strong)] bg-[var(--fg-muted)]" />
+                      <span className="h-2.5 w-2.5 rounded-sm bg-[var(--error)]" />
+                    </div>
+                  )}
                 </div>
-              </div>
-              <span className="text-xs text-muted-foreground">{colorCount} →</span>
-            </Link>
-            <Link href="/design-system/tokens/typography" className="flex items-center justify-between rounded-md px-3 py-2 text-sm hover:bg-muted transition-colors">
-              <span>Typography</span>
-              <span className="text-xs text-muted-foreground">→</span>
-            </Link>
-            <Link href="/design-system/tokens/spacing" className="flex items-center justify-between rounded-md px-3 py-2 text-sm hover:bg-muted transition-colors">
-              <span>Spacing & Radius</span>
-              <span className="text-xs text-muted-foreground">{spacingCount + radiusCount} →</span>
-            </Link>
-            <Link href="/design-system/docs" className="flex items-center justify-between rounded-md px-3 py-2 text-sm hover:bg-muted transition-colors">
-              <span>Documentation</span>
-              <span className="text-xs text-muted-foreground">→</span>
-            </Link>
-            <Link href="/design-system/recommendations" className="flex items-center justify-between rounded-md px-3 py-2 text-sm hover:bg-muted transition-colors">
-              <span>Recommendations</span>
-              <span className="text-xs text-muted-foreground">→</span>
-            </Link>
+                <span className="inline-flex items-center gap-1.5 text-[10.5px] text-[var(--fg-dim)] tabular-nums">
+                  {l.meta}
+                  <ArrowRight size={10} strokeWidth={2} />
+                </span>
+              </Link>
+            ))}
           </div>
         </div>
 
-        {/* Recent changes log */}
-        <div className="rounded-lg border p-4">
-          <h2 className="text-sm font-medium mb-3">Recent changes</h2>
-          {changes.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No changes recorded yet.</p>
-          ) : (
-            <div className="space-y-0">
-              {changes.slice(0, 10).map((change, i) => (
-                <div key={i} className="flex items-start gap-3 py-2 border-b last:border-0">
-                  <span className="text-sm shrink-0 mt-0.5" title={change.type}>
-                    {typeIcons[change.type] || '📝'}
-                  </span>
-                  <div className="flex-1 min-w-0">
-                    <div className="text-sm truncate">{change.description}</div>
-                    <div className="text-xs text-muted-foreground">{timeAgo(change.timestamp)}</div>
+        <div className="rounded-md border border-[var(--border-strong)] bg-[var(--surface)]">
+          <div className="border-b border-[var(--border)] px-4 py-3">
+            <SectionLabel>recent changes</SectionLabel>
+          </div>
+          <div className="p-2">
+            {changes.length === 0 ? (
+              <p className="mono px-2 py-3 text-[11.5px] text-[var(--fg-dim)]">
+                no changes recorded yet
+              </p>
+            ) : (
+              <div className="flex flex-col">
+                {changes.slice(0, 10).map((change, i) => (
+                  <div
+                    key={i}
+                    className="mono flex items-start gap-3 border-b border-[var(--border)] px-3 py-2 text-[11.5px] last:border-0"
+                  >
+                    <span
+                      className={`mt-0.5 shrink-0 rounded-[3px] border border-[var(--border-strong)] bg-[var(--elevated)] px-1.5 text-[9px] uppercase tracking-[0.08em] ${
+                        TYPE_TONE[change.type] || 'text-[var(--fg-muted)]'
+                      }`}
+                    >
+                      {TYPE_LABELS[change.type] || 'EVENT'}
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <div className="truncate text-[var(--foreground)]">
+                        {change.description}
+                      </div>
+                      <div className="mt-0.5 text-[10.5px] text-[var(--fg-dim)]">
+                        {timeAgo(change.timestamp)}
+                      </div>
+                    </div>
                   </div>
-                </div>
-              ))}
-              {changes.length > 10 && (
-                <p className="text-xs text-muted-foreground pt-2 text-center">
-                  + {changes.length - 10} more changes
-                </p>
-              )}
-            </div>
-          )}
+                ))}
+                {changes.length > 10 && (
+                  <p className="mono pt-2 text-center text-[10.5px] text-[var(--fg-dim)]">
+                    + {changes.length - 10} more changes
+                  </p>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>

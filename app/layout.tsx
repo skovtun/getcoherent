@@ -1,8 +1,19 @@
 import type { Metadata, Viewport } from 'next'
 import type { ReactNode } from 'react'
 import Script from 'next/script'
+import { Geist, Geist_Mono } from 'next/font/google'
 import './globals.css'
 import { AppNav } from './AppNav'
+
+const geistSans = Geist({
+  variable: '--font-geist-sans',
+  subsets: ['latin'],
+})
+
+const geistMono = Geist_Mono({
+  variable: '--font-geist-mono',
+  subsets: ['latin'],
+})
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://getcoherent.design'
 
@@ -77,7 +88,7 @@ export default function RootLayout({
   children: ReactNode
 }) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en" className={`dark ${geistSans.variable} ${geistMono.variable}`}>
       <head>
         <Script
           defer
@@ -85,7 +96,7 @@ export default function RootLayout({
           data-website-id="481512f2-c9c8-4768-95c7-9951ad9d1b14"
           strategy="afterInteractive"
         />
-        <style dangerouslySetInnerHTML={{ __html: ":root {\n  --background: #FFFFFF;\n  --foreground: #111827;\n  --primary: #3B82F6;\n  --primary-foreground: #fafafa;\n  --secondary: #8B5CF6;\n  --secondary-foreground: #fafafa;\n  --muted: #F3F4F6;\n  --muted-foreground: #7c8088;\n  --destructive: #EF4444;\n  --destructive-foreground: #fafafa;\n  --border: #E5E7EB;\n  --input: #E5E7EB;\n  --ring: #3B82F6;\n  --card: #FFFFFF;\n  --card-foreground: #111827;\n  --popover: #FFFFFF;\n  --popover-foreground: #111827;\n  --success: #10B981;\n  --warning: #F59E0B;\n  --error: #EF4444;\n  --info: #3B82F6;\n  --accent: #F59E0B;\n  --accent-foreground: #111827;\n}\n.dark {\n  --background: #111827;\n  --foreground: #F9FAFB;\n  --primary: #60A5FA;\n  --primary-foreground: #09090b;\n  --secondary: #A78BFA;\n  --secondary-foreground: #09090b;\n  --muted: #1F2937;\n  --muted-foreground: #91949c;\n  --destructive: #F87171;\n  --destructive-foreground: #09090b;\n  --border: #374151;\n  --input: #374151;\n  --ring: #60A5FA;\n  --card: #111827;\n  --card-foreground: #F9FAFB;\n  --popover: #111827;\n  --popover-foreground: #F9FAFB;\n  --success: #34D399;\n  --warning: #FBBF24;\n  --error: #F87171;\n  --info: #60A5FA;\n  --accent: #FBBF24;\n  --accent-foreground: #F9FAFB;\n}\n" }} />
+        <style dangerouslySetInnerHTML={{ __html: ":root {\n  --background: #fafaf7;\n  --foreground: #0a0a0a;\n  --primary: #17a862;\n  --primary-foreground: #ffffff;\n  --secondary: #4a5568;\n  --secondary-foreground: #ffffff;\n  --muted: #f4f3ef;\n  --muted-foreground: #4a4a47;\n  --destructive: #d1383d;\n  --destructive-foreground: #ffffff;\n  --border: #e7e6e0;\n  --input: #e7e6e0;\n  --ring: #17a862;\n  --card: #ffffff;\n  --card-foreground: #0a0a0a;\n  --popover: #ffffff;\n  --popover-foreground: #0a0a0a;\n  --success: #17a862;\n  --warning: #b47a10;\n  --error: #d1383d;\n  --info: #4a5568;\n  --accent: #17a862;\n  --accent-foreground: #ffffff;\n  --surface: #ffffff;\n  --surface-2: #f4f3ef;\n  --elevated: #ffffff;\n  --border-strong: #d4d2cb;\n  --fg-muted: #4a4a47;\n  --fg-dim: #8a8883;\n  --accent-dim: #0f7f48;\n  --accent-glow: rgba(23, 168, 98, 0.18);\n  --glass-bg: rgba(250, 250, 247, 0.78);\n}\n.dark {\n  --background: #0a0a0a;\n  --foreground: #ededed;\n  --primary: #3ecf8e;\n  --primary-foreground: #052b17;\n  --secondary: #a1a1a1;\n  --secondary-foreground: #0a0a0a;\n  --muted: #161616;\n  --muted-foreground: #a1a1a1;\n  --destructive: #ff5c5c;\n  --destructive-foreground: #ffffff;\n  --border: #1f1f1f;\n  --input: #1f1f1f;\n  --ring: #3ecf8e;\n  --card: #111111;\n  --card-foreground: #ededed;\n  --popover: #1a1a1a;\n  --popover-foreground: #ededed;\n  --success: #3ecf8e;\n  --warning: #f5a623;\n  --error: #ff5c5c;\n  --info: #61afef;\n  --accent: #3ecf8e;\n  --accent-foreground: #052b17;\n  --surface: #111111;\n  --surface-2: #161616;\n  --elevated: #1a1a1a;\n  --border-strong: #2a2a2a;\n  --fg-muted: #a1a1a1;\n  --fg-dim: #6b6b6b;\n  --accent-dim: #2fa872;\n  --accent-glow: rgba(62, 207, 142, 0.18);\n  --glass-bg: rgba(10, 10, 10, 0.72);\n}\n" }} />
       </head>
       <body className="min-h-screen flex flex-col bg-background text-foreground antialiased">
         <AppNav />

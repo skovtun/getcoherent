@@ -1,8 +1,80 @@
 'use client'
 import Link from 'next/link'
-import { Fragment } from 'react'
+import { Fragment, useEffect, useState } from 'react'
 import { usePathname } from 'next/navigation'
-import { useState, useEffect } from 'react'
+import { ChevronRight, Menu, Moon, Sun, X } from 'lucide-react'
+
+type Component = {
+  id: string
+  name?: string
+  category?: string
+}
+
+const CATEGORY_NAMES: Record<string, string> = {
+  form: 'Form',
+  layout: 'Layout',
+  navigation: 'Navigation',
+  'data-display': 'Data Display',
+  overlay: 'Overlay',
+  feedback: 'Feedback',
+  other: 'Other',
+}
+
+const KNOWN_NAMES: Record<string, string> = {
+  button: 'Button',
+  input: 'Input',
+  label: 'Label',
+  select: 'Select',
+  switch: 'Switch',
+  checkbox: 'Checkbox',
+  card: 'Card',
+  badge: 'Badge',
+  table: 'Table',
+  textarea: 'Textarea',
+  dialog: 'Dialog',
+  'alert-dialog': 'AlertDialog',
+  separator: 'Separator',
+  progress: 'Progress',
+  avatar: 'Avatar',
+  tabs: 'Tabs',
+  accordion: 'Accordion',
+  skeleton: 'Skeleton',
+  tooltip: 'Tooltip',
+  'radio-group': 'RadioGroup',
+  slider: 'Slider',
+}
+
+const NAV_LINKS = [
+  { href: '/design-system', label: 'Overview' },
+  { href: '/design-system/components', label: 'Components' },
+  { href: '/design-system/shared', label: 'Shared' },
+  { href: '/design-system/tokens', label: 'Tokens' },
+  { href: '/design-system/sitemap', label: 'Sitemap' },
+  { href: '/design-system/docs', label: 'Docs' },
+  { href: '/design-system/recommendations', label: 'Recs' },
+]
+
+function ThemeToggle() {
+  const [dark, setDark] = useState(true)
+  useEffect(() => {
+    setDark(document.documentElement.classList.contains('dark'))
+  }, [])
+  const toggle = () => {
+    const next = !dark
+    setDark(next)
+    document.documentElement.classList.toggle('dark', next)
+  }
+  return (
+    <button
+      type="button"
+      onClick={toggle}
+      aria-label={dark ? 'Switch to light theme' : 'Switch to dark theme'}
+      className="press inline-flex h-8 w-8 items-center justify-center rounded-md border border-[var(--border-strong)] bg-[var(--elevated)] text-[var(--fg-muted)] outline-none hover:text-[var(--foreground)]"
+    >
+      {dark ? <Sun size={13} strokeWidth={2} /> : <Moon size={13} strokeWidth={2} />}
+    </button>
+  )
+}
 
 export default function DesignSystemLayout({
   children,
@@ -10,14 +82,14 @@ export default function DesignSystemLayout({
   children: React.ReactNode
 }) {
   const pathname = usePathname()
-  const [components, setComponents] = useState<any[]>([])
+  const [components, setComponents] = useState<Component[]>([])
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const isComponentsPage = pathname?.startsWith('/design-system/components')
 
   useEffect(() => {
     fetch('/api/design-system/config')
-      .then(res => res.json())
-      .then(data => setComponents(data.components || []))
+      .then((res) => res.json())
+      .then((data) => setComponents(data.components || []))
       .catch(() => [])
   }, [])
 
@@ -26,172 +98,149 @@ export default function DesignSystemLayout({
     if (!acc[category]) acc[category] = []
     acc[category].push(comp)
     return acc
-  }, {} as Record<string, any[]>)
+  }, {} as Record<string, Component[]>)
 
-  const categoryNames: Record<string, string> = {
-    form: 'Form',
-    layout: 'Layout',
-    navigation: 'Navigation',
-    'data-display': 'Data Display',
-    overlay: 'Overlay',
-    feedback: 'Feedback',
-    other: 'Other'
-  }
-
-  const knownNames: Record<string, string> = {
-    button: 'Button', input: 'Input', label: 'Label', select: 'Select',
-    switch: 'Switch', checkbox: 'Checkbox', card: 'Card', badge: 'Badge',
-    table: 'Table', textarea: 'Textarea', dialog: 'Dialog',
-    'alert-dialog': 'AlertDialog', separator: 'Separator', progress: 'Progress',
-    avatar: 'Avatar', tabs: 'Tabs', accordion: 'Accordion', skeleton: 'Skeleton',
-    tooltip: 'Tooltip', 'radio-group': 'RadioGroup', slider: 'Slider',
-  }
-  const compName = (c: any) => knownNames[c.id] || c.name || c.id
+  const compName = (c: Component) => KNOWN_NAMES[c.id] || c.name || c.id
 
   const getBreadcrumbs = () => {
     if (!pathname) return []
     const parts = pathname.replace('/design-system', '').split('/').filter(Boolean)
-    const crumbs: { label: string; href: string }[] = [{ label: 'Design System', href: '/design-system' }]
+    const crumbs: { label: string; href: string }[] = [
+      { label: 'design-system', href: '/design-system' },
+    ]
     if (parts[0] === 'components') {
-      crumbs.push({ label: 'Components', href: '/design-system/components' })
+      crumbs.push({ label: 'components', href: '/design-system/components' })
       if (parts[1]) {
-        const bcName = knownNames[parts[1]] || parts[1].charAt(0).toUpperCase() + parts[1].slice(1).replace(/-/g, ' ')
-        crumbs.push({ label: bcName, href: pathname })
+        crumbs.push({
+          label: KNOWN_NAMES[parts[1]] || parts[1].replace(/-/g, ' '),
+          href: pathname,
+        })
       }
     }
     if (parts[0] === 'shared') {
-      crumbs.push({ label: 'Shared Components', href: '/design-system/shared' })
-      if (parts[1]) {
-        crumbs.push({ label: decodeURIComponent(parts[1]), href: pathname })
-      }
+      crumbs.push({ label: 'shared', href: '/design-system/shared' })
+      if (parts[1]) crumbs.push({ label: decodeURIComponent(parts[1]), href: pathname })
     }
     if (parts[0] === 'tokens') {
-      crumbs.push({ label: 'Tokens', href: '/design-system/tokens' })
-      if (parts[1]) {
-        crumbs.push({ label: parts[1].charAt(0).toUpperCase() + parts[1].slice(1), href: pathname })
-      }
+      crumbs.push({ label: 'tokens', href: '/design-system/tokens' })
+      if (parts[1]) crumbs.push({ label: parts[1], href: pathname })
     }
-    if (parts[0] === 'sitemap') {
-      crumbs.push({ label: 'Sitemap', href: '/design-system/sitemap' })
-    }
+    if (parts[0] === 'sitemap') crumbs.push({ label: 'sitemap', href: '/design-system/sitemap' })
     if (parts[0] === 'docs') {
-      crumbs.push({ label: 'Documentation', href: '/design-system/docs' })
+      crumbs.push({ label: 'docs', href: '/design-system/docs' })
       if (parts[1]) {
-        const label = parts[1] === 'for-designers' ? 'For designers' : parts[1].charAt(0).toUpperCase() + parts[1].slice(1)
+        const label = parts[1] === 'for-designers' ? 'for designers' : parts[1]
         crumbs.push({ label, href: pathname })
       }
     }
     if (parts[0] === 'recommendations') {
-      crumbs.push({ label: 'Recommendations', href: '/design-system/recommendations' })
+      crumbs.push({ label: 'recommendations', href: '/design-system/recommendations' })
     }
     return crumbs
   }
 
   const breadcrumbs = getBreadcrumbs()
 
-  const navLinks = [
-    { href: '/design-system', label: 'Overview' },
-    { href: '/design-system/components', label: 'Components' },
-    { href: '/design-system/shared', label: 'Shared Components' },
-    { href: '/design-system/tokens', label: 'Tokens' },
-    { href: '/design-system/sitemap', label: 'Sitemap' },
-    { href: '/design-system/docs', label: 'Documentation' },
-    { href: '/design-system/recommendations', label: 'Recommendations' },
-  ]
-
   const isActive = (href: string) =>
     pathname === href || (href !== '/design-system' && pathname?.startsWith(href))
 
-  const [dark, setDark] = useState(false)
-  useEffect(() => {
-    setDark(document.documentElement.classList.contains('dark'))
-  }, [])
-  const toggleTheme = () => {
-    const next = !dark
-    setDark(next)
-    document.documentElement.classList.toggle('dark', next)
-  }
-
   return (
-    <div className="min-h-screen flex flex-col bg-background">
-      {/* Top bar */}
-      <header className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="mx-auto w-full max-w-[1200px] px-6 lg:px-8">
-          <div className="flex h-14 items-center justify-between gap-4">
-            <Link
-              href="/"
-              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors shrink-0"
-            >
-              ← Back to App
-            </Link>
-            <nav className="hidden md:flex items-center gap-1 flex-1 justify-center">
-              {navLinks.map((link) => (
+    <div className="flex min-h-screen flex-col bg-[var(--background)] text-[var(--foreground)]">
+      {/* HEADER */}
+      <header className="sticky top-0 z-50 border-b border-[var(--border)] bg-[var(--glass-bg)] backdrop-blur-md">
+        <div className="mx-auto flex h-14 w-full max-w-[1200px] items-center gap-4 px-4 lg:px-6">
+          {/* section title */}
+          <Link
+            href="/design-system"
+            className="mono inline-flex items-center gap-2 text-[12px] font-medium uppercase tracking-[0.18em] text-[var(--foreground)] outline-none transition-colors hover:text-[var(--accent)]"
+          >
+            <span className="h-1.5 w-1.5 rounded-[2px] bg-[var(--accent)]" />
+            design system
+          </Link>
+
+          {/* nav */}
+          <nav
+            aria-label="Design System navigation"
+            className="mono hidden flex-1 items-center justify-center gap-1 md:flex"
+          >
+            {NAV_LINKS.map((link) => {
+              const active = isActive(link.href)
+              return (
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${isActive(link.href) ? 'bg-muted text-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'}`}
+                  className={`press inline-flex h-8 items-center rounded-md px-3 text-[12.5px] outline-none transition-colors ${
+                    active
+                      ? 'bg-[var(--elevated)] text-[var(--foreground)] shadow-[inset_0_0_0_1px_var(--border-strong)]'
+                      : 'text-[var(--fg-muted)] hover:text-[var(--foreground)]'
+                  }`}
                 >
                   {link.label}
                 </Link>
-              ))}
-            </nav>
-            <div className="flex items-center gap-1 shrink-0">
-              <button
-                onClick={toggleTheme}
-                className="flex items-center justify-center w-9 h-9 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-                title={dark ? 'Switch to light theme' : 'Switch to dark theme'}
-                aria-label="Toggle theme"
-              >
-                {dark ? (
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
-                ) : (
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
-                )}
-              </button>
-              <button
-                type="button"
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="md:hidden flex items-center justify-center w-9 h-9 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-                aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
-              >
-                {mobileMenuOpen ? (
-                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
-                ) : (
-                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
-                )}
-              </button>
-            </div>
+              )
+            })}
+          </nav>
+
+          <div className="ml-auto flex items-center gap-1.5 md:ml-0">
+            <ThemeToggle />
+            <button
+              type="button"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+              className="press inline-flex h-8 w-8 items-center justify-center rounded-md border border-[var(--border-strong)] bg-[var(--elevated)] text-[var(--fg-muted)] outline-none hover:text-[var(--foreground)] md:hidden"
+            >
+              {mobileMenuOpen ? <X size={14} strokeWidth={2} /> : <Menu size={14} strokeWidth={2} />}
+            </button>
           </div>
         </div>
-        {mobileMenuOpen && (
-          <div className="border-t border-border md:hidden">
-            <nav className="mx-auto w-full max-w-[1200px] px-6 py-3 flex flex-col gap-0.5">
-              {navLinks.map((link) => (
+
+        {/* mobile menu */}
+        <div
+          className={`overflow-hidden border-t border-[var(--border)] bg-[var(--glass-bg)] backdrop-blur-md transition-[max-height,opacity] duration-[220ms] ease-[cubic-bezier(0.25,1,0.5,1)] md:hidden ${
+            mobileMenuOpen ? 'max-h-[480px] opacity-100' : 'max-h-0 opacity-0'
+          }`}
+          aria-hidden={!mobileMenuOpen}
+        >
+          <div className="mx-auto flex w-full max-w-[1200px] flex-col gap-1 px-4 py-3 lg:px-6">
+            {NAV_LINKS.map((link) => {
+              const active = isActive(link.href)
+              return (
                 <Link
                   key={link.href}
                   href={link.href}
                   onClick={() => setMobileMenuOpen(false)}
-                  className={`px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${isActive(link.href) ? 'bg-muted text-foreground' : 'text-muted-foreground hover:bg-muted hover:text-foreground'}`}
+                  className={`mono flex items-center justify-between rounded-md px-3 py-2.5 text-[13px] ${
+                    active
+                      ? 'bg-[var(--elevated)] text-[var(--foreground)] shadow-[inset_0_0_0_1px_var(--border-strong)]'
+                      : 'text-[var(--fg-muted)] hover:bg-[var(--elevated)] hover:text-[var(--foreground)]'
+                  }`}
                 >
                   {link.label}
+                  <ChevronRight size={12} strokeWidth={2} className="text-[var(--fg-dim)]" />
                 </Link>
-              ))}
-            </nav>
+              )
+            })}
           </div>
-        )}
+        </div>
       </header>
 
-      {breadcrumbs.length > 2 && (
-        <div className="border-b border-border bg-muted/30">
-          <div className="mx-auto w-full max-w-[1200px] px-6 lg:px-8 py-2.5">
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+      {/* BREADCRUMB (show for nested pages) */}
+      {breadcrumbs.length > 1 && (
+        <div className="border-b border-[var(--border)] bg-[var(--surface)]">
+          <div className="mx-auto w-full max-w-[1200px] px-4 py-2 lg:px-6">
+            <div className="mono flex flex-wrap items-center gap-1.5 text-[11px] text-[var(--fg-dim)]">
               {breadcrumbs.map((crumb, i) => (
                 <Fragment key={`${crumb.href}-${i}`}>
-                  {i > 0 && <span aria-hidden className="text-border">/</span>}
+                  {i > 0 && <span aria-hidden>/</span>}
                   {i === breadcrumbs.length - 1 ? (
-                    <span className="text-foreground font-medium">{crumb.label}</span>
+                    <span className="text-[var(--accent)]">{crumb.label}</span>
                   ) : (
-                    <Link href={crumb.href} className="hover:text-foreground transition-colors">{crumb.label}</Link>
+                    <Link
+                      href={crumb.href}
+                      className="transition-colors hover:text-[var(--foreground)]"
+                    >
+                      {crumb.label}
+                    </Link>
                   )}
                 </Fragment>
               ))}
@@ -200,28 +249,34 @@ export default function DesignSystemLayout({
         </div>
       )}
 
-      {/* Content area — centered container, sidebar + main fill its width */}
-      <div className="flex-1 flex flex-col min-h-0">
-        <div className="mx-auto w-full max-w-[1200px] px-6 lg:px-8 flex-1 flex min-h-0">
-          {/* Sidebar — always visible on desktop for components pages */}
+      {/* CONTENT */}
+      <div className="flex min-h-0 flex-1 flex-col">
+        <div className="mx-auto flex w-full min-h-0 max-w-[1200px] flex-1 px-4 lg:px-6">
           {isComponentsPage && (
-            <aside className="hidden md:flex flex-col shrink-0 w-[200px] border-r border-border">
-              <nav className="sticky top-14 overflow-y-auto py-6 pr-4 space-y-6 h-[calc(100vh-3.5rem)]">
+            <aside className="hidden w-[220px] shrink-0 flex-col border-r border-[var(--border)] md:flex">
+              <nav className="sticky top-14 h-[calc(100vh-3.5rem)] space-y-5 overflow-y-auto py-6 pr-4">
                 {Object.entries(groupedComponents).map(([category, comps]) => (
                   <div key={category}>
-                    <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                      {categoryNames[category] || category}
+                    <div className="mono mb-1.5 px-2 text-[10px] uppercase tracking-[0.16em] text-[var(--fg-dim)]">
+                      {CATEGORY_NAMES[category] || category}
                     </div>
-                    <div className="space-y-0.5">
-                      {(comps as any[]).map((comp: any) => (
-                        <Link
-                          key={comp.id}
-                          href={`/design-system/components/${comp.id}`}
-                          className={`block px-3 py-1.5 rounded-md text-sm transition-colors ${pathname === `/design-system/components/${comp.id}` ? 'bg-muted text-foreground font-medium' : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'}`}
-                        >
-                          {compName(comp)}
-                        </Link>
-                      ))}
+                    <div className="flex flex-col gap-[2px]">
+                      {comps.map((comp) => {
+                        const active = pathname === `/design-system/components/${comp.id}`
+                        return (
+                          <Link
+                            key={comp.id}
+                            href={`/design-system/components/${comp.id}`}
+                            className={`press mono rounded-md px-2 py-1.5 text-[12.5px] outline-none transition-colors ${
+                              active
+                                ? 'bg-[var(--elevated)] text-[var(--foreground)] shadow-[inset_0_0_0_1px_var(--border-strong)]'
+                                : 'text-[var(--fg-muted)] hover:bg-[var(--elevated)] hover:text-[var(--foreground)]'
+                            }`}
+                          >
+                            {compName(comp)}
+                          </Link>
+                        )
+                      })}
                     </div>
                   </div>
                 ))}
@@ -229,22 +284,35 @@ export default function DesignSystemLayout({
             </aside>
           )}
 
-          {/* Main content — fills remaining width */}
-          <main className={`flex-1 min-w-0 py-8 ${isComponentsPage ? 'md:pl-8' : ''}`}>
+          <main className={`min-w-0 flex-1 py-8 ${isComponentsPage ? 'md:pl-8' : ''}`}>
             {children}
           </main>
         </div>
 
-        <footer className="border-t border-border shrink-0">
-          <div className="mx-auto w-full max-w-[1200px] px-6 lg:px-8 py-5">
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-muted-foreground">
-              <p>
-                Coherent Design Method · by{' '}
-                <a href="https://www.linkedin.com/in/sergeikovtun/" target="_blank" rel="noopener noreferrer" className="underline hover:text-foreground transition-colors">
+        {/* FOOTER */}
+        <footer className="border-t border-[var(--border)] bg-[var(--surface)]">
+          <div className="mx-auto w-full max-w-[1200px] px-4 py-4 lg:px-6">
+            <div className="mono flex flex-col items-start justify-between gap-2 text-[11px] text-[var(--fg-dim)] sm:flex-row sm:items-center">
+              <span>
+                coherent design method · by{' '}
+                <a
+                  href="https://www.linkedin.com/in/sergeikovtun/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="link-sweep text-[var(--foreground)] hover:text-[var(--accent)]"
+                >
                   Sergei Kovtun
                 </a>
-              </p>
-              <Link href="/" className="hover:text-foreground transition-colors">Back to App</Link>
+              </span>
+              <a
+                href="https://github.com/skovtun/coherent-design-method"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="press inline-flex items-center gap-1.5 rounded border border-[var(--border-strong)] bg-[var(--elevated)] px-2 py-1 text-[10.5px] text-[var(--fg-muted)] hover:text-[var(--foreground)]"
+              >
+                <span className="h-1.5 w-1.5 rounded-[2px] bg-[var(--accent)]" />
+                github · coherent-design-method
+              </a>
             </div>
           </div>
         </footer>
