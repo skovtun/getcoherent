@@ -17,15 +17,13 @@ import {
 import { motion, useReducedMotion } from 'framer-motion'
 import { useEffect, useState } from 'react'
 import { Container } from '@/components/site/Container'
-import { VerticalStripes } from '@/components/site/VerticalStripes'
 import { AmbientOrbs } from '@/components/site/AmbientOrbs'
 import { HeroShader } from '@/components/site/HeroShader'
 import { Reveal, Stagger, StaggerItem } from '@/components/site/Reveal'
 import { CountUp } from '@/components/site/CountUp'
 import { SectionLabel } from '@/components/site/SectionLabel'
 import { SiteBadge } from '@/components/site/Badge'
-import { Logo, CoherentMark } from '@/components/site/Logo'
-import { DesignSystemCard } from '@/components/site/DesignSystemCard'
+import { Logo } from '@/components/site/Logo'
 import { HeroPreview } from '@/components/site/HeroPreview'
 import { VersionBadge } from '@/components/site/VersionBadge'
 
@@ -103,8 +101,6 @@ export default function LandingPage() {
 
   return (
     <>
-      <VerticalStripes />
-
       {/* NAV */}
       <header className="sticky top-0 z-40 border-b border-[var(--border)] bg-[var(--glass-bg)] backdrop-blur-md">
         <Container className="flex h-16 items-center justify-between">

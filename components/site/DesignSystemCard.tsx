@@ -108,7 +108,7 @@ export function DesignSystemCard() {
           <section className="grid grid-cols-2 items-start gap-3">
             <div>
               <SectionLabel>spacing · 4pt</SectionLabel>
-              <div className="mt-2 flex h-14 items-end gap-1 rounded-md border border-[var(--border)] bg-[var(--elevated)] px-2.5 pb-1.5 pt-2">
+              <div className="mt-2 flex items-end gap-1 rounded-md border border-[var(--border)] bg-[var(--elevated)] px-2.5 py-2">
                 {[4, 8, 12, 16, 20, 24, 32].map((v) => (
                   <div key={v} className="flex flex-col items-center gap-1">
                     <div
@@ -122,7 +122,7 @@ export function DesignSystemCard() {
             </div>
             <div>
               <SectionLabel>radius</SectionLabel>
-              <div className="mt-2 flex h-14 items-end gap-2 rounded-md border border-[var(--border)] bg-[var(--elevated)] px-2.5 pb-1.5 pt-2">
+              <div className="mt-2 flex items-center gap-2 rounded-md border border-[var(--border)] bg-[var(--elevated)] px-2.5 py-2">
                 {[
                   { label: 'sm', r: 2 },
                   { label: 'md', r: 6 },
