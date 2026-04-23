@@ -82,9 +82,10 @@ function CopyChip({ text }: { text: string }) {
 
 const MOBILE_NAV_LINKS = [
   { href: '#problem', label: 'Problem' },
+  { href: '#what', label: 'What is Coherent' },
   { href: '#how', label: 'How it works' },
-  { href: '#design-system', label: 'Design System' },
-  { href: '#start', label: 'Get started' },
+  { href: '#atmospheres', label: 'Atmospheres' },
+  { href: '#start', label: 'Getting started' },
   { href: '#faq', label: 'FAQ' },
 ]
 
@@ -126,22 +127,28 @@ export default function LandingPage() {
               Problem
             </Link>
             <Link
+              href="#what"
+              className="link-sweep transition-colors hover:text-[var(--foreground)]"
+            >
+              What is Coherent
+            </Link>
+            <Link
               href="#how"
               className="link-sweep transition-colors hover:text-[var(--foreground)]"
             >
               How it works
             </Link>
             <Link
-              href="#design-system"
+              href="#atmospheres"
               className="link-sweep transition-colors hover:text-[var(--foreground)]"
             >
-              Design System
+              Atmospheres
             </Link>
             <Link
               href="#start"
               className="link-sweep transition-colors hover:text-[var(--foreground)]"
             >
-              Get started
+              Getting started
             </Link>
             <Link
               href="#faq"
@@ -1067,11 +1074,11 @@ function DSTokensPanel() {
         {/* SPACING */}
         <section>
           <DSLabel>spacing · 4pt</DSLabel>
-          <div className="mt-1.5 flex h-[56px] items-end justify-between gap-1 rounded border border-[var(--border)] bg-[var(--elevated)] px-2.5 pb-1 pt-1.5">
+          <div className="mt-1.5 flex h-[56px] items-center justify-between gap-1 rounded border border-[var(--border)] bg-[var(--elevated)] px-2.5">
             {spacing.map((v) => (
               <div key={v} className="flex flex-col items-center gap-1">
                 <div
-                  className="rounded-[1.5px] bg-gradient-to-t from-[var(--accent)]/50 to-[var(--accent)]"
+                  className="rounded-[1.5px] bg-[var(--accent)]"
                   style={{ width: `${v}px`, height: `${v}px` }}
                 />
                 <span className="mono text-[8.5px] tabular-nums text-[var(--fg-dim)]">

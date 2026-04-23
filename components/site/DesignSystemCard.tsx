@@ -116,11 +116,11 @@ export function DesignSystemCard() {
           <section className="grid grid-cols-2 items-start gap-3">
             <div>
               <SectionLabel>spacing · 4pt</SectionLabel>
-              <div className="mt-2 flex h-[56px] items-end justify-between gap-1 rounded-md border border-[var(--border)] bg-[var(--elevated)] px-2.5 pb-1 pt-1.5">
-                {[4, 8, 12, 16, 20, 24, 32].map((v) => (
+              <div className="mt-2 flex h-[56px] items-center justify-between gap-1 rounded-md border border-[var(--border)] bg-[var(--elevated)] px-2.5">
+                {[4, 8, 12, 16, 24, 32].map((v) => (
                   <div key={v} className="flex flex-col items-center gap-1">
                     <div
-                      className="rounded-[1.5px] bg-gradient-to-t from-[var(--accent)]/50 to-[var(--accent)]"
+                      className="rounded-[1.5px] bg-[var(--accent)]"
                       style={{ width: `${v}px`, height: `${v}px` }}
                     />
                     <span className="mono text-[9px] tabular-nums text-[var(--fg-dim)]">
@@ -132,7 +132,7 @@ export function DesignSystemCard() {
             </div>
             <div>
               <SectionLabel>radius</SectionLabel>
-              <div className="mt-2 grid h-[56px] grid-cols-4 items-center gap-1.5 rounded-md border border-[var(--border)] bg-[var(--elevated)] p-1.5">
+              <div className="mt-2 grid grid-cols-4 gap-1.5">
                 {[
                   { label: 'sm', px: 2 },
                   { label: 'md', px: 6 },
@@ -141,7 +141,7 @@ export function DesignSystemCard() {
                 ].map((r) => (
                   <div
                     key={r.label}
-                    className="mono flex h-full items-center justify-center border border-[var(--border-strong)] bg-[var(--surface)] text-[9px]"
+                    className="mono flex h-9 items-center justify-center border border-[var(--border-strong)] bg-[var(--elevated)] text-[10px]"
                     style={{ borderRadius: `${r.px}px` }}
                   >
                     <span className="text-[var(--accent)]">{r.label}</span>
