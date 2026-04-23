@@ -44,17 +44,11 @@ export const metadata: Metadata = {
     siteName: 'Coherent Design Method',
     title: 'Coherent Design Method — Once designed. Consistent UI everywhere.',
     description: 'Generate multi-page UI prototypes where every page shares the same components, colors, and layout. CLI for consistent design systems.',
-    images: [
-      {
-        url: '/og.png',
-        width: 1200,
-        height: 630,
-        alt: 'Coherent Design Method',
-      },
-    ],
   },
   twitter: {
     card: 'summary_large_image',
+    site: '@uxui_dev',
+    creator: '@uxui_dev',
     title: 'Coherent Design Method — Once designed. Consistent UI everywhere.',
     description: 'Generate multi-page UI prototypes where every page shares the same components and layout. CLI for consistent design systems.',
   },
@@ -77,8 +71,57 @@ export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   themeColor: [
-    { media: '(prefers-color-scheme: light)', color: 'white' },
-    { media: '(prefers-color-scheme: dark)', color: 'black' },
+    { media: '(prefers-color-scheme: light)', color: '#17a862' },
+    { media: '(prefers-color-scheme: dark)', color: '#3ecf8e' },
+  ],
+}
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'Organization',
+      '@id': `${siteUrl}/#organization`,
+      name: 'Coherent Design Method',
+      url: siteUrl,
+      logo: `${siteUrl}/coherent-logo.svg`,
+      founder: {
+        '@type': 'Person',
+        name: 'Sergei Kovtun',
+        url: 'https://www.linkedin.com/in/sergeikovtun/',
+      },
+      sameAs: [
+        'https://github.com/skovtun/coherent-design-method',
+        'https://www.npmjs.com/package/@getcoherent/cli',
+      ],
+    },
+    {
+      '@type': 'SoftwareApplication',
+      '@id': `${siteUrl}/#software`,
+      name: 'Coherent Design Method',
+      applicationCategory: 'DeveloperApplication',
+      operatingSystem: 'macOS, Linux, Windows',
+      description:
+        'CLI that generates multi-page UI prototypes where every page shares the same components, design tokens, and layout. Prevents AI-generated design drift across pages.',
+      url: siteUrl,
+      downloadUrl: 'https://www.npmjs.com/package/@getcoherent/cli',
+      softwareHelp: `${siteUrl}/design-system/docs`,
+      license: 'https://opensource.org/licenses/MIT',
+      author: { '@id': `${siteUrl}/#organization` },
+      offers: {
+        '@type': 'Offer',
+        price: '0',
+        priceCurrency: 'USD',
+      },
+    },
+    {
+      '@type': 'WebSite',
+      '@id': `${siteUrl}/#website`,
+      url: siteUrl,
+      name: 'Coherent Design Method',
+      publisher: { '@id': `${siteUrl}/#organization` },
+      inLanguage: 'en-US',
+    },
   ],
 }
 
@@ -91,7 +134,11 @@ export default function RootLayout({
     <html lang="en" className={`dark ${geistSans.variable} ${geistMono.variable}`}>
       <head>
         <Script
-          defer
+          id="ld-json"
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+        <Script
           src="https://cloud.umami.is/script.js"
           data-website-id="481512f2-c9c8-4768-95c7-9951ad9d1b14"
           strategy="afterInteractive"
