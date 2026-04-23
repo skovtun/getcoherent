@@ -84,9 +84,7 @@ const MOBILE_NAV_LINKS = [
   { href: '#problem', label: 'Problem' },
   { href: '#how', label: 'How it works' },
   { href: '#design-system', label: 'Design System' },
-  { href: '#two-ways', label: 'Two ways' },
-  { href: '#start', label: 'Getting started' },
-  { href: '#sponsor', label: 'Sponsor' },
+  { href: '#start', label: 'Get started' },
   { href: '#faq', label: 'FAQ' },
 ]
 
