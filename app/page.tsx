@@ -25,6 +25,7 @@ import { SiteBadge } from '@/components/site/Badge'
 import { Logo } from '@/components/site/Logo'
 import { HeroPreview } from '@/components/site/HeroPreview'
 import { VersionBadge } from '@/components/site/VersionBadge'
+import { FALLBACK_CLI_VERSION } from '@/lib/version'
 
 const INSTALL = 'npm i -g @getcoherent/cli'
 
@@ -92,7 +93,8 @@ const MOBILE_NAV_LINKS = [
 export default function LandingPage() {
   const reduce = useReducedMotion()
   const [menuOpen, setMenuOpen] = useState(false)
-  const [cliVersion, setCliVersion] = useState('0.7.27')
+  const [cliVersion, setCliVersion] = useState(FALLBACK_CLI_VERSION)
+  const [githubStars, setGithubStars] = useState<number | null>(null)
   const currentYear = new Date().getFullYear()
   useEffect(() => {
     let active = true
@@ -100,6 +102,12 @@ export default function LandingPage() {
       .then((r) => r.json())
       .then((d: { version?: string }) => {
         if (active && d?.version) setCliVersion(d.version)
+      })
+      .catch(() => {})
+    fetch('/api/release', { cache: 'force-cache' })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d: { stars?: number | null } | null) => {
+        if (active && typeof d?.stars === 'number') setGithubStars(d.stars)
       })
       .catch(() => {})
     return () => {
@@ -226,7 +234,7 @@ export default function LandingPage() {
         <AmbientOrbs />
         <div className="noise" aria-hidden />
 
-        <Container className="relative pt-20 pb-16 lg:pt-24 lg:pb-20">
+        <Container className="relative pt-16 pb-14 lg:pt-20 lg:pb-16">
           {/* TEXT — centered, stacked, wider */}
           <div className="mx-auto max-w-5xl text-center">
             <motion.div {...fade(0)} className="flex items-center justify-center gap-2">
@@ -235,23 +243,24 @@ export default function LandingPage() {
 
             <motion.h1
               {...fade(1)}
-              className="mono mt-6 text-[38px] font-medium leading-[1.08] tracking-[-0.03em] text-[var(--foreground)] md:text-[52px] lg:text-[60px]"
+              className="mono mx-auto mt-7 max-w-[24ch] text-[36px] font-medium leading-[1.0] tracking-[-0.035em] text-[var(--foreground)] md:max-w-[26ch] md:text-[54px] lg:max-w-[28ch] lg:text-[64px]"
             >
-              Design Interactive UI that&apos;s
+              The AI doesn&apos;t know
+              <br />
+              what it built yesterday.
               <br />
               <span className="bg-gradient-to-r from-[var(--accent)] via-[color-mix(in_oklab,var(--accent),white_25%)] to-[#61afef] bg-clip-text text-transparent">
-                Consistent Everywhere.
+                Coherent does.
               </span>
             </motion.h1>
 
             <motion.p
               {...fade(2)}
-              className="mx-auto mt-6 max-w-[620px] text-[15.5px] leading-[1.6] text-[var(--fg-muted)]"
+              className="mx-auto mt-6 max-w-[540px] text-[14.5px] leading-[1.55] text-[var(--fg-muted)]"
+              style={{ textWrap: 'balance' }}
             >
-              Design interactive multi-page UI instead of static mockups. The
-              Design System comes with it — typography, colors, components,
-              everything editable. Change one thing, updates cascade across
-              every page.
+              Multi-page UI with a real design system. Shared components,
+              editable tokens — change one, every page updates.
             </motion.p>
 
             <motion.div
@@ -298,6 +307,17 @@ export default function LandingPage() {
                 </span>
                 atmospheres
               </span>
+              {githubStars !== null && githubStars >= 50 && (
+                <>
+                  <span className="text-[var(--border-strong)]">/</span>
+                  <span className="inline-flex items-baseline gap-1.5">
+                    <span className="text-[17px] font-medium tabular-nums text-[var(--foreground)]">
+                      {githubStars.toLocaleString('en-US')}
+                    </span>
+                    GitHub stars
+                  </span>
+                </>
+              )}
               <span className="text-[var(--border-strong)]">/</span>
               <span className="inline-flex items-center gap-1.5">
                 <span className="h-1.5 w-1.5 rounded-full bg-[var(--accent)]" />
@@ -310,6 +330,31 @@ export default function LandingPage() {
           <div className="mt-12 lg:mt-14">
             <HeroPreview />
           </div>
+        </Container>
+      </section>
+
+      {/* KILLER LINE — value prop at-a-glance (v0 / Figma / Coherent) */}
+      <section
+        aria-label="How Coherent compares"
+        className="relative z-[1] border-b border-[var(--border)] bg-[var(--background)]"
+      >
+        <Container className="py-24 lg:py-32">
+          <Reveal>
+            <div className="mx-auto max-w-4xl text-center">
+              <p className="mono text-[18px] font-normal leading-[1.35] tracking-[-0.01em] text-[var(--fg-dim)] md:text-[22px] lg:text-[26px]">
+                Claude Design gives you a mockup.
+              </p>
+              <p className="mono mt-2 text-[18px] font-normal leading-[1.35] tracking-[-0.01em] text-[var(--fg-dim)] md:text-[22px] lg:text-[26px]">
+                Figma Make gives you pages.
+              </p>
+              <p className="mono mt-10 text-[30px] font-medium leading-[1.15] tracking-[-0.025em] text-[var(--foreground)] md:mt-12 md:text-[44px] lg:text-[56px]">
+                Coherent gives you the whole product UI{' '}
+                <span className="bg-gradient-to-r from-[var(--accent)] via-[color-mix(in_oklab,var(--accent),white_20%)] to-[#61afef] bg-clip-text text-transparent">
+                  and a Design System.
+                </span>
+              </p>
+            </div>
+          </Reveal>
         </Container>
       </section>
 
@@ -372,8 +417,8 @@ export default function LandingPage() {
               You prompt a multi-page UI and the first page is great. The
               second has a different header. The third has different buttons.
               By page four you&apos;re spending more time fixing
-              inconsistencies than shipping. The AI doesn&apos;t know what
-              it built yesterday.
+              inconsistencies than shipping. Each page is generated alone,
+              without memory of the last one.
             </p>
           </Reveal>
           <div className="mt-12 grid gap-4 md:grid-cols-2">
@@ -492,10 +537,6 @@ export default function LandingPage() {
                 color, a font, a spacing step — lands in
                 <span className="mono text-[var(--foreground)]"> design-system.config.ts</span>.
                 By page three, you have a living DS you can open, audit, and edit.
-              </p>
-              <p className="mt-4 text-[14.5px] leading-[1.65] text-[var(--fg-muted)]">
-                v0 gives you a page. Figma gives you a mockup. Coherent gives
-                you a page <span className="text-[var(--foreground)]">and</span> a Design System.
               </p>
             </Reveal>
           </div>
@@ -622,25 +663,122 @@ export default function LandingPage() {
         </Container>
       </section>
 
-      {/* [07] ATMOSPHERES */}
-      <section id="atmospheres" className="relative z-[1] border-b border-[var(--border)] bg-[var(--background)]">
+      {/* [05] COMPARE — positioning vs adjacent AI UI tools */}
+      <section id="compare" className="relative z-[1] border-b border-[var(--border)] bg-[var(--background)]">
         <Container className="py-28">
           <Reveal>
-            <SectionLabel index="05">Atmospheres (optional)</SectionLabel>
+            <SectionLabel index="05">How it compares</SectionLabel>
           </Reveal>
           <Reveal delay={0.05}>
             <h2 className="mono mt-8 max-w-3xl text-[34px] font-medium leading-[1.08] tracking-[-0.02em] lg:text-[44px]">
-              Start from a vibe.
+              Different tools, different goals.
+              <br />
+              <span className="text-[var(--fg-dim)]">Here&apos;s where Coherent fits.</span>
+            </h2>
+            <p className="mt-5 max-w-2xl text-[14.5px] leading-[1.65] text-[var(--fg-muted)]">
+              Most AI UI tools optimize for a single artifact — a page, a
+              mockup, a set of screens. Coherent optimizes for the product
+              around them: the shared components, the tokens, the Design
+              System that stays honest as the app grows.
+            </p>
+          </Reveal>
+
+          <Reveal delay={0.1}>
+            <div className="mt-12 overflow-x-auto rounded-lg border border-[var(--border-strong)] bg-[var(--surface)]">
+              <table className="mono w-full min-w-[720px] border-collapse text-left text-[13px]">
+                <thead>
+                  <tr className="border-b border-[var(--border-strong)] bg-[var(--surface-2)]">
+                    <th className="px-4 py-3 text-[10.5px] font-medium uppercase tracking-[0.14em] text-[var(--fg-dim)]">
+                      Tool
+                    </th>
+                    <th className="px-4 py-3 text-[10.5px] font-medium uppercase tracking-[0.14em] text-[var(--fg-dim)]">
+                      Scope
+                    </th>
+                    <th className="px-4 py-3 text-[10.5px] font-medium uppercase tracking-[0.14em] text-[var(--fg-dim)]">
+                      Output
+                    </th>
+                    <th className="px-4 py-3 text-[10.5px] font-medium uppercase tracking-[0.14em] text-[var(--fg-dim)]">
+                      What you get
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="[&>tr]:border-b [&>tr]:border-[var(--border)] [&>tr:last-child]:border-b-0">
+                  <tr>
+                    <td className="px-4 py-3 font-medium text-[var(--foreground)]">
+                      v0 &middot; Lovable
+                    </td>
+                    <td className="px-4 py-3 text-[var(--fg-muted)]">Single page</td>
+                    <td className="px-4 py-3 text-[var(--fg-muted)]">Next.js / React code</td>
+                    <td className="px-4 py-3 text-[var(--fg-muted)]">A page, fast</td>
+                  </tr>
+                  <tr>
+                    <td className="px-4 py-3 font-medium text-[var(--foreground)]">
+                      Claude Design
+                    </td>
+                    <td className="px-4 py-3 text-[var(--fg-muted)]">Visual mockup</td>
+                    <td className="px-4 py-3 text-[var(--fg-muted)]">
+                      Canvas + exports (HTML / PPTX / PDF)
+                    </td>
+                    <td className="px-4 py-3 text-[var(--fg-muted)]">A designed mockup</td>
+                  </tr>
+                  <tr>
+                    <td className="px-4 py-3 font-medium text-[var(--foreground)]">
+                      Figma Make
+                    </td>
+                    <td className="px-4 py-3 text-[var(--fg-muted)]">Multi-screen prototype</td>
+                    <td className="px-4 py-3 text-[var(--fg-muted)]">Code + prototype</td>
+                    <td className="px-4 py-3 text-[var(--fg-muted)]">Connected screens</td>
+                  </tr>
+                  <tr className="bg-[color-mix(in_oklab,var(--accent),transparent_92%)]">
+                    <td className="px-4 py-3 font-medium text-[var(--accent)]">Coherent</td>
+                    <td className="px-4 py-3 text-[var(--foreground)]">
+                      Multi-page product UI
+                    </td>
+                    <td className="px-4 py-3 text-[var(--foreground)]">
+                      Next.js repo + Design System
+                    </td>
+                    <td className="px-4 py-3 text-[var(--foreground)]">
+                      Pages + a DS that grows with them
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </Reveal>
+
+          <Reveal delay={0.15}>
+            <p className="mono mt-6 max-w-3xl text-[12.5px] leading-[1.7] text-[var(--fg-muted)]">
+              Use v0 / Lovable for quick one-off pages. Use Claude Design
+              when the output is a visual review. Use Figma Make when the
+              handoff is a prototype. Use Coherent when the end-state is a
+              multi-page product with a Design System you own and can ship.
+            </p>
+          </Reveal>
+        </Container>
+      </section>
+
+      {/* [06] ATMOSPHERES */}
+      <section id="atmospheres" className="relative z-[1] border-b border-[var(--border)] bg-[var(--background)]">
+        <Container className="py-28">
+          <Reveal>
+            <SectionLabel index="06">Atmospheres (optional)</SectionLabel>
+          </Reveal>
+          <Reveal delay={0.05}>
+            <h2 className="mono mt-8 max-w-3xl text-[34px] font-medium leading-[1.08] tracking-[-0.02em] lg:text-[44px]">
+              Start from a Design System.
               <br />
               <span className="text-[var(--fg-dim)]">Customize everything. Or build your own.</span>
             </h2>
             <p className="mt-6 max-w-2xl text-[14.5px] leading-[1.65] text-[var(--fg-muted)]">
-              Atmospheres are starter kits — typography, color, spacing, motion,
-              layout, mood bundled together — so you don&apos;t start from a
-              blank canvas. Pick one, see the first page, like the direction?
-              Customize from there. Don&apos;t like the direction? Drop it and
-              build your own Design System from scratch. Atmospheres are the
-              head start, not the ceiling.
+              Atmospheres are pre-wired Design System foundations —
+              typography, color, spacing, motion, and layout decisions
+              made in advance, so no generation starts from a blank canvas.
+              Pick one, see the first page, like the direction? Tweak any
+              token from there. Don&apos;t like the direction? Drop it and
+              define a Design System from scratch. Atmospheres are the
+              head start, not the ceiling — and the reason generated UI
+              doesn&apos;t default to the same Inter-plus-purple-gradient
+              look every AI tool produces.
             </p>
           </Reveal>
 
@@ -681,11 +819,11 @@ export default function LandingPage() {
                     atmosphere
                   </div>
                   <div className="mono mt-1 text-[16px] font-medium text-[var(--foreground)]">
-                    Your own vibe
+                    Define your own
                   </div>
                 </div>
                 <p className="text-[13px] leading-[1.55] text-[var(--fg-muted)]">
-                  Skip the starter kits. Define fonts, palette, rhythm in
+                  Skip the presets. Define fonts, palette, and rhythm in
                   <span className="mono text-[var(--foreground)]"> design-system.config.ts</span>.
                   Save it — it becomes your 6th atmosphere.
                 </p>
@@ -698,11 +836,11 @@ export default function LandingPage() {
         </Container>
       </section>
 
-      {/* [08] GETTING STARTED */}
+      {/* [07] GETTING STARTED */}
       <section id="start" className="relative z-[1] border-b border-[var(--border)] bg-[var(--background)]">
         <Container className="py-28">
           <Reveal>
-            <SectionLabel index="06">Getting started</SectionLabel>
+            <SectionLabel index="07">Getting started</SectionLabel>
           </Reveal>
           <Reveal delay={0.05}>
             <h2 className="mono mt-8 max-w-3xl text-[38px] font-medium leading-[1.08] tracking-[-0.02em] lg:text-[48px]">
@@ -761,11 +899,11 @@ export default function LandingPage() {
         </Container>
       </section>
 
-      {/* [09] SPONSOR */}
+      {/* [08] SPONSOR */}
       <section id="sponsor" className="relative z-[1] border-b border-[var(--border)] bg-[var(--background)]">
         <Container className="py-28">
           <Reveal>
-            <SectionLabel index="07">Open source</SectionLabel>
+            <SectionLabel index="08">Open source</SectionLabel>
           </Reveal>
           <Reveal delay={0.05}>
             <h2 className="mono mt-8 max-w-3xl text-[34px] font-medium leading-[1.08] tracking-[-0.02em] lg:text-[44px]">
@@ -842,11 +980,11 @@ export default function LandingPage() {
         </Container>
       </section>
 
-      {/* [10] FAQ */}
+      {/* [09] FAQ */}
       <section id="faq" className="relative z-[1] border-b border-[var(--border)] bg-[var(--background)]">
         <Container className="py-28">
           <Reveal>
-            <SectionLabel index="08">Questions</SectionLabel>
+            <SectionLabel index="09">Questions</SectionLabel>
           </Reveal>
           <Reveal delay={0.05}>
             <h2 className="mono mt-8 max-w-3xl text-[32px] font-medium leading-[1.12] tracking-[-0.02em] lg:text-[42px]">
@@ -1107,8 +1245,8 @@ function DSTokensPanel() {
               <span className="mono inline-flex h-5 items-center rounded-[2px] border border-[var(--error)]/35 bg-[var(--error)]/12 px-1.5 text-[9px] uppercase tracking-[0.1em] text-[var(--error)]">
                 error
               </span>
-              <span className="mono ml-auto text-[9.5px] text-[var(--accent)]">
-                CID-001…005
+              <span className="mono ml-auto text-[9.5px] text-[var(--fg-dim)]">
+                4 shared
               </span>
             </div>
             {/* row 2 — toggle + checkbox + radio */}
@@ -1144,8 +1282,8 @@ function DSTokensPanel() {
                 </span>
                 <span className="mono text-[9.5px] text-[var(--fg-muted)]">slider</span>
               </span>
-              <span className="mono ml-auto text-[9.5px] text-[var(--accent)]">
-                CID-006…009
+              <span className="mono ml-auto text-[9.5px] text-[var(--fg-dim)]">
+                4 shared
               </span>
             </div>
           </div>
@@ -1499,20 +1637,32 @@ const HOW_STEPS = [
 
 const FAQ = [
   {
-    q: 'What is Coherent Design Method?',
-    a: 'A CLI that generates multi-page UI prototypes where every page shares the same components, colors, and layout. Unlike single-page generators, Coherent builds a Design System as you go — component library, tokens, docs — so the UI stays consistent across your whole app. Change one thing, everywhere it updates.',
-  },
-  {
     q: 'Who is it for?',
-    a: 'Founders building multi-page prototypes, designers who ship code, product teams that need clickable demos that behave like real software, and devs who want a clean Next.js starting point with a Design System already in place. If your work is one-off single pages, v0/Lovable cover you. If you need interconnected pages plus a DS that grows, that\'s Coherent.',
+    a: 'Founders building multi-page prototypes, designers who ship code, product teams that need clickable demos that behave like real software, and devs who want a clean Next.js starting point with a Design System already in place. If your work is one-off single pages or canvas mockups, v0 / Lovable / Claude Design cover you. If you need interconnected pages plus a DS that grows, that\'s Coherent.',
   },
   {
     q: 'Do I need to know how to code?',
     a: 'No. You describe what you want in plain English — pages, atmosphere, tweaks — and Coherent writes the code. Everything (components, tokens, pages) is editable by describing the change you want. The output is standard code, so if you or your dev wants to open a file directly, everything is transparent and readable. English-first, code-always-available.',
   },
   {
-    q: 'How is this different from v0, Lovable, or Bolt?',
-    a: 'Those tools nail a single page. Ask for a second page and you get a different header, different buttons, different spacing. Coherent targets the step after: multi-page consistency plus a Design System that grows alongside. You still use v0 or Lovable for quick single-page explorations. You use Coherent when you need a coherent multi-page product (and a DS you own).',
+    q: 'How is this different from v0, Lovable, Claude Design, or Figma Make?',
+    a: 'Different shape of problem. v0 and Lovable ship a single page fast. Claude Design outputs canvas mockups you export or hand off. Figma Make generates multi-screen prototypes. What none of them hand you: a durable Design System that survives across pages and dev handoff. Coherent targets that gap. Every generation writes to a shared component registry and design-system.config.ts, so by page three you have a living DS you can open, audit, edit, and ship. Use those tools for one-off explorations. Use Coherent when you need a coherent multi-page product (and a DS you own).',
+  },
+  {
+    q: 'Does Coherent work with my existing Next.js project?',
+    a: 'Not yet. Today Coherent is a scaffolder: `coherent init my-app` creates a new Next.js 15 project, and `coherent chat` iterates on pages inside it. Retrofit into an existing codebase (`coherent adopt`) is on the roadmap for v0.8.x. For now, the cleanest path is: scaffold a new Coherent project, lift components and tokens over manually, then point your existing backend at it.',
+  },
+  {
+    q: 'Can I import my existing Figma tokens or design system?',
+    a: 'No direct import today. Coherent generates tokens into `design-system.config.ts` plus CSS variables at scaffold time. If you already have a palette, typography scale, or spacing system, the fastest path is: pick the closest atmosphere, open `design-system.config.ts` and `globals.css`, and paste your values in — everything cascades from there. A Figma / JSON token import is on the roadmap.',
+  },
+  {
+    q: 'What happens when the LLM context fills up on a large project?',
+    a: 'It doesn\'t. Each page generation receives a curated context — only the shared components the plan says it uses, design rules matched to the page\'s sections, and up to 3 same-type existing pages. Prompt size stays roughly constant whether the app has 3 pages or 30. With prompt caching (Claude), per-page cost stays linear as the project grows.',
+  },
+  {
+    q: 'Does it support React Server Components and Next.js 15 App Router?',
+    a: 'Yes. Coherent targets Next.js 15 with the App Router by default. Generated pages are Server Components unless they need interactivity (hooks, event handlers, browser APIs) — then Coherent adds `\'use client\'` as needed. Tailwind CSS v3 or v4 is auto-detected from your `package.json`; v4 tokens ship in the right format automatically.',
   },
   {
     q: 'Can I use it with Cursor, Claude Code, or other AI editors?',
@@ -1524,19 +1674,11 @@ const FAQ = [
   },
   {
     q: 'What AI model does it use?',
-    a: 'Works with Anthropic Claude (recommended — best results, especially with prompt caching) or OpenAI GPT-4. You bring your own API key — prompted once at setup. Typical cost: $0.01–0.03 per page. A 5-page app scaffold costs roughly $0.10. No subscription, no middleman, no platform fee.',
-  },
-  {
-    q: 'Is it free?',
-    a: 'Yes. MIT licensed. Everything — CLI, all atmospheres, all validators, all features — is in the open source tier. No gated features, no usage limits. You bring your own LLM key. Sponsoring is optional — it funds faster atmosphere engine development.',
-  },
-  {
-    q: 'What is an atmosphere?',
-    a: 'Atmospheres are starter kits — a complete visual vocabulary (typography, color, spacing, motion, layout, mood) bundled together so you don\'t start from a blank canvas. Pick Console, Warm, Editorial — or skip them entirely and define your own design-system.config.ts. Atmospheres are convenience, never a ceiling.',
+    a: 'Works with Anthropic Claude (recommended — best results, especially with prompt caching) or OpenAI GPT. You bring your own API key — prompted once at setup. Typical cost: $0.01–0.03 per page. A 5-page app scaffold costs roughly $0.10. No subscription, no middleman, no platform fee.',
   },
   {
     q: 'Is it production-ready?',
-    a: 'v0.7.27 today is stable for prototypes, internal tools, stakeholder demos, and dev handoff. 1,068 tests passing, 23 design principles enforced, MIT licensed. For bet-the-company public product UI, treat the output as a strong starting point and do a human polish pass. For fast internal dashboards and handoffs, ship today.',
+    a: 'The current release is stable for prototypes, internal tools, stakeholder demos, and dev handoff. 1,068 tests passing, 23 design principles enforced, MIT licensed. For bet-the-company public product UI, treat the output as a strong starting point and do a human polish pass. For fast internal dashboards and handoffs, ship today.',
   },
   {
     q: 'Where do I get help?',
@@ -1556,7 +1698,7 @@ const PRICING = [
       'All 5 atmospheres (Console, Warm, Editorial, Minimal, Bold + your own)',
       '23 enforced rules + auto-fix',
       'Shared components registry',
-      'Wiki memory loop',
+      'Built-in rule & golden-pattern library',
       'Works with Cursor, Claude Code, any AI editor',
     ],
     cta: 'Install now',

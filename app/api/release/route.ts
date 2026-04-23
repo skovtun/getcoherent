@@ -1,13 +1,10 @@
 import { NextResponse } from 'next/server'
+import { FALLBACK_CLI_VERSION, FALLBACK_RELEASE, formatVersion } from '@/lib/version'
 
 const OWNER = 'skovtun'
 const REPO = 'coherent-design-method'
 
-const FALLBACK = {
-  version: 'v0.7.24',
-  date: 'april 2026',
-  name: 'atmosphere engine',
-}
+const FALLBACK = FALLBACK_RELEASE
 
 /**
  * Extract the latest release subtitle from CHANGELOG.md. The canonical format
@@ -37,7 +34,7 @@ function extractReleaseName(changelog: string): string | null {
 
 export async function GET() {
   try {
-    const [pkgRes, commitRes, changelogRes] = await Promise.all([
+    const [pkgRes, commitRes, changelogRes, repoRes] = await Promise.all([
       fetch(
         `https://raw.githubusercontent.com/${OWNER}/${REPO}/main/packages/cli/package.json`,
         { next: { revalidate: 3600 } },
@@ -56,6 +53,18 @@ export async function GET() {
         `https://raw.githubusercontent.com/${OWNER}/${REPO}/main/docs/CHANGELOG.md`,
         { next: { revalidate: 3600 } },
       ),
+      // Repo metadata — for stargazers_count. Cached ~6h, independent of
+      // the other freshness signals.
+      fetch(
+        `https://api.github.com/repos/${OWNER}/${REPO}`,
+        {
+          headers: {
+            Accept: 'application/vnd.github+json',
+            'X-GitHub-Api-Version': '2022-11-28',
+          },
+          next: { revalidate: 21600 },
+        },
+      ),
     ])
 
     if (!pkgRes.ok) {
@@ -63,8 +72,8 @@ export async function GET() {
     }
 
     const pkg = await pkgRes.json()
-    const versionRaw = String(pkg.version || '0.7.24')
-    const version = versionRaw.startsWith('v') ? versionRaw : `v${versionRaw}`
+    const versionRaw = String(pkg.version || FALLBACK_CLI_VERSION)
+    const version = formatVersion(versionRaw)
 
     let date = FALLBACK.date
     if (commitRes.ok) {
@@ -85,8 +94,16 @@ export async function GET() {
       if (extracted) name = extracted
     }
 
+    let stars: number | null = null
+    if (repoRes.ok) {
+      const repo = await repoRes.json()
+      if (typeof repo?.stargazers_count === 'number') {
+        stars = repo.stargazers_count
+      }
+    }
+
     return NextResponse.json(
-      { version, date, name },
+      { version, date, name, stars },
       {
         headers: {
           'Cache-Control':
@@ -95,6 +112,6 @@ export async function GET() {
       },
     )
   } catch {
-    return NextResponse.json(FALLBACK, { status: 200 })
+    return NextResponse.json({ ...FALLBACK, stars: null }, { status: 200 })
   }
 }

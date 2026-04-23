@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { ExternalLink, Radio } from 'lucide-react'
+import { FALLBACK_RELEASE } from '@/lib/version'
 
 type Release = {
   version: string
@@ -10,11 +11,7 @@ type Release = {
   name?: string
 }
 
-const FALLBACK: Release = {
-  version: 'v0.7.24',
-  date: 'april 2026',
-  name: 'atmosphere engine',
-}
+const FALLBACK: Release = FALLBACK_RELEASE
 
 const RELEASES_URL =
   'https://github.com/skovtun/coherent-design-method/releases'
@@ -48,7 +45,6 @@ export function VersionBadge() {
         {release.version}
       </span>
       <span className="mono inline-flex items-center gap-1 text-[11.5px] text-[var(--fg-dim)] transition-colors duration-[150ms] group-hover:text-[var(--fg-muted)]">
-        {release.name && <span>· {release.name}</span>}
         <span>· {release.date}</span>
         <ExternalLink
           size={10}
