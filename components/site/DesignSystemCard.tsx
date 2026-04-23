@@ -116,27 +116,38 @@ export function DesignSystemCard() {
           <section className="grid grid-cols-2 items-start gap-3">
             <div>
               <SectionLabel>spacing · 4pt</SectionLabel>
-              <div className="mt-2 flex items-center justify-between gap-2 rounded-md border border-[var(--border)] bg-[var(--elevated)] px-3 py-3">
+              <div className="mt-2 flex h-[56px] items-end justify-between gap-1.5 rounded-md border border-[var(--border)] bg-[var(--elevated)] px-3 pb-1.5 pt-2">
                 {[4, 8, 12, 16, 20, 24, 32].map((v) => (
-                  <span
-                    key={v}
-                    className="mono text-[10px] tabular-nums text-[var(--fg-dim)]"
-                  >
-                    {v}
-                  </span>
+                  <div key={v} className="flex flex-col items-center gap-1">
+                    <div
+                      className="w-[6px] rounded-[1.5px] bg-gradient-to-t from-[var(--accent)]/40 to-[var(--accent)]"
+                      style={{ height: `${v}px` }}
+                    />
+                    <span className="mono text-[9px] tabular-nums text-[var(--fg-dim)]">
+                      {v}
+                    </span>
+                  </div>
                 ))}
               </div>
             </div>
             <div>
               <SectionLabel>radius</SectionLabel>
-              <div className="mt-2 flex items-center justify-between gap-2 rounded-md border border-[var(--border)] bg-[var(--elevated)] px-3 py-3">
-                {['sm', 'md', 'lg', 'xl'].map((label) => (
-                  <span
-                    key={label}
-                    className="mono text-[10px] text-[var(--fg-dim)]"
-                  >
-                    {label}
-                  </span>
+              <div className="mt-2 grid h-[56px] grid-cols-4 items-center gap-1.5 rounded-md border border-[var(--border)] bg-[var(--elevated)] px-2 py-2">
+                {[
+                  { label: 'sm', px: 2 },
+                  { label: 'md', px: 6 },
+                  { label: 'lg', px: 10 },
+                  { label: 'xl', px: 14 },
+                ].map((r) => (
+                  <div key={r.label} className="flex flex-col items-center gap-0.5">
+                    <div
+                      className="h-6 w-full border border-[var(--border-strong)] bg-[var(--surface)]"
+                      style={{ borderRadius: `${r.px}px` }}
+                    />
+                    <span className="mono text-[9px] text-[var(--fg-dim)]">
+                      <span className="text-[var(--accent)]">{r.label}</span> {r.px}
+                    </span>
+                  </div>
                 ))}
               </div>
             </div>
