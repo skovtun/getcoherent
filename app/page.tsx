@@ -10,7 +10,7 @@ import {
   Menu,
   Moon,
   Package,
-  ShieldCheck,
+  Plus,
   Sun,
   X,
 } from 'lucide-react'
@@ -20,7 +20,6 @@ import { Container } from '@/components/site/Container'
 import { AmbientOrbs } from '@/components/site/AmbientOrbs'
 import { HeroShader } from '@/components/site/HeroShader'
 import { Reveal, Stagger, StaggerItem } from '@/components/site/Reveal'
-import { CountUp } from '@/components/site/CountUp'
 import { SectionLabel } from '@/components/site/SectionLabel'
 import { SiteBadge } from '@/components/site/Badge'
 import { Logo } from '@/components/site/Logo'
@@ -82,17 +81,32 @@ function CopyChip({ text }: { text: string }) {
 }
 
 const MOBILE_NAV_LINKS = [
-  { href: '#what', label: 'What it is' },
+  { href: '#problem', label: 'Problem' },
+  { href: '#how', label: 'How it works' },
   { href: '#design-system', label: 'Design System' },
-  { href: '#control', label: 'Full control' },
-  { href: '#atmospheres', label: 'Atmospheres' },
+  { href: '#two-ways', label: 'Two ways' },
+  { href: '#start', label: 'Getting started' },
+  { href: '#sponsor', label: 'Sponsor' },
   { href: '#faq', label: 'FAQ' },
-  { href: '#pricing', label: 'Pricing' },
 ]
 
 export default function LandingPage() {
   const reduce = useReducedMotion()
   const [menuOpen, setMenuOpen] = useState(false)
+  const [cliVersion, setCliVersion] = useState('0.7.27')
+  const currentYear = new Date().getFullYear()
+  useEffect(() => {
+    let active = true
+    fetch('https://registry.npmjs.org/@getcoherent/cli/latest')
+      .then((r) => r.json())
+      .then((d: { version?: string }) => {
+        if (active && d?.version) setCliVersion(d.version)
+      })
+      .catch(() => {})
+    return () => {
+      active = false
+    }
+  }, [])
   const fade = (i: number) => ({
     initial: reduce ? false : { opacity: 0, y: 18 },
     animate: { opacity: 1, y: 0 },
@@ -106,12 +120,18 @@ export default function LandingPage() {
         <Container className="flex h-16 items-center justify-between">
           <Logo size={26} />
 
-          <nav className="hidden items-center gap-6 text-[13px] text-[var(--fg-muted)] md:flex">
+          <nav className="hidden items-center gap-5 text-[13px] text-[var(--fg-muted)] md:flex">
             <Link
-              href="#what"
+              href="#problem"
               className="link-sweep transition-colors hover:text-[var(--foreground)]"
             >
-              What it is
+              Problem
+            </Link>
+            <Link
+              href="#how"
+              className="link-sweep transition-colors hover:text-[var(--foreground)]"
+            >
+              How it works
             </Link>
             <Link
               href="#design-system"
@@ -120,16 +140,10 @@ export default function LandingPage() {
               Design System
             </Link>
             <Link
-              href="#control"
+              href="#start"
               className="link-sweep transition-colors hover:text-[var(--foreground)]"
             >
-              Full control
-            </Link>
-            <Link
-              href="#atmospheres"
-              className="link-sweep transition-colors hover:text-[var(--foreground)]"
-            >
-              Atmospheres
+              Get started
             </Link>
             <Link
               href="#faq"
@@ -137,24 +151,20 @@ export default function LandingPage() {
             >
               FAQ
             </Link>
-            <Link
-              href="#pricing"
-              className="link-sweep transition-colors hover:text-[var(--foreground)]"
-            >
-              Pricing
-            </Link>
           </nav>
           <div className="flex items-center gap-2">
             <ThemeToggle />
             <Link
               href="https://github.com/skovtun/coherent-design-method"
+              target="_blank"
+              rel="noopener noreferrer"
               className="press mono hidden h-8 items-center gap-2 rounded-md border border-[var(--border-strong)] bg-[var(--elevated)] px-3 text-[12px] text-[var(--foreground)] outline-none hover:border-[var(--accent-dim)] hover:text-[var(--accent)] md:inline-flex"
             >
               <Package size={12} strokeWidth={2} />
               GitHub
             </Link>
             <Link
-              href="#install"
+              href="#start"
               className="btn-primary-site mono inline-flex h-8 items-center gap-2 rounded-md px-3 text-[12px]"
             >
               Get Started
@@ -193,6 +203,8 @@ export default function LandingPage() {
             ))}
             <Link
               href="https://github.com/skovtun/coherent-design-method"
+              target="_blank"
+              rel="noopener noreferrer"
               onClick={() => setMenuOpen(false)}
               className="mono mt-1 flex items-center gap-2 rounded-md border border-[var(--border-strong)] bg-[var(--elevated)] px-3 py-2.5 text-[13px] text-[var(--foreground)] hover:border-[var(--accent-dim)] hover:text-[var(--accent)]"
             >
@@ -242,7 +254,7 @@ export default function LandingPage() {
               className="mt-7 flex flex-wrap items-center justify-center gap-3"
             >
               <Link
-                href="#install"
+                href="#start"
                 className="btn-primary-site mono inline-flex h-11 items-center gap-2 rounded-md px-5 text-[13.5px]"
               >
                 Start Designing
@@ -259,21 +271,33 @@ export default function LandingPage() {
 
             <motion.div
               {...fade(4)}
-              className="mono mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-[11.5px] text-[var(--fg-dim)]"
+              className="mono mt-10 flex flex-wrap items-center justify-center gap-x-5 gap-y-3 text-[12px] text-[var(--fg-dim)]"
             >
+              <span className="inline-flex items-baseline gap-1.5">
+                <span className="text-[17px] font-medium tabular-nums text-[var(--foreground)]">
+                  23
+                </span>
+                enforced rules
+              </span>
+              <span className="text-[var(--border-strong)]">/</span>
+              <span className="inline-flex items-baseline gap-1.5">
+                <span className="text-[17px] font-medium tabular-nums text-[var(--foreground)]">
+                  1,068
+                </span>
+                tests passing
+              </span>
+              <span className="text-[var(--border-strong)]">/</span>
+              <span className="inline-flex items-baseline gap-1.5">
+                <span className="text-[17px] font-medium tabular-nums text-[var(--foreground)]">
+                  5
+                </span>
+                atmospheres
+              </span>
+              <span className="text-[var(--border-strong)]">/</span>
               <span className="inline-flex items-center gap-1.5">
                 <span className="h-1.5 w-1.5 rounded-full bg-[var(--accent)]" />
                 MIT · open source
               </span>
-              <span>·</span>
-              <span className="inline-flex items-center gap-1.5">
-                <ShieldCheck size={11} strokeWidth={1.75} />
-                23 design principles baked in
-              </span>
-              <span>·</span>
-              <span>Next.js 15 output</span>
-              <span>·</span>
-              <span>bring your own Claude / GPT key</span>
             </motion.div>
           </div>
 
@@ -292,337 +316,312 @@ export default function LandingPage() {
           </div>
           <div className="marquee-mask overflow-hidden">
             <div className="marquee">
-              {[
-                ...['Cursor', 'Claude Code', 'Windsurf', 'Zed', 'v0.dev', 'Lovable'],
-                ...['Cursor', 'Claude Code', 'Windsurf', 'Zed', 'v0.dev', 'Lovable'],
-              ].map((name, i) => (
-                <div
-                  key={i}
-                  className="mono flex min-w-[180px] items-center justify-center gap-2 px-6 text-[14px] tracking-tight text-[var(--fg-muted)] opacity-70 transition-opacity hover:text-[var(--foreground)] hover:opacity-100"
-                >
-                  <span className="text-[var(--accent)]">◆</span>
-                  <span>{name}</span>
-                </div>
-              ))}
+              {(() => {
+                const editors = [
+                  { name: 'VS Code', logo: '/editors/vscode.svg' },
+                  { name: 'Cursor', logo: '/editors/cursor.svg' },
+                  { name: 'Claude Code', logo: '/editors/claude-code.svg' },
+                  { name: 'Windsurf', logo: '/editors/windsurf.svg' },
+                  { name: 'Zed', logo: '/editors/zed.svg' },
+                  { name: 'JetBrains', logo: '/editors/jetbrains.svg' },
+                ]
+                return [...editors, ...editors].map((editor, i) => (
+                  <div
+                    key={i}
+                    className="mono flex min-w-[180px] items-center justify-center gap-2.5 px-6 text-[14px] tracking-tight text-[var(--fg-muted)] opacity-70 transition-opacity hover:text-[var(--foreground)] hover:opacity-100"
+                  >
+                    <span
+                      aria-hidden
+                      className="inline-block h-4 w-4 shrink-0 bg-current"
+                      style={{
+                        WebkitMaskImage: `url(${editor.logo})`,
+                        maskImage: `url(${editor.logo})`,
+                        WebkitMaskRepeat: 'no-repeat',
+                        maskRepeat: 'no-repeat',
+                        WebkitMaskPosition: 'center',
+                        maskPosition: 'center',
+                        WebkitMaskSize: 'contain',
+                        maskSize: 'contain',
+                      }}
+                    />
+                    <span>{editor.name}</span>
+                  </div>
+                ))
+              })()}
             </div>
           </div>
         </Container>
       </section>
 
-      {/* WHAT IS COHERENT */}
+      {/* [01] PROBLEM */}
+      <section id="problem" className="relative z-[1] border-b border-[var(--border)] bg-[var(--background)]">
+        <Container className="py-24">
+          <Reveal>
+            <SectionLabel index="01">The problem</SectionLabel>
+          </Reveal>
+          <Reveal delay={0.05}>
+            <h2 className="mono mt-8 max-w-3xl text-[34px] font-medium leading-[1.08] tracking-[-0.02em] lg:text-[44px]">
+              You&apos;ve seen this before.
+            </h2>
+            <p className="mt-5 max-w-2xl text-[14.5px] leading-[1.65] text-[var(--fg-muted)]">
+              You prompt a multi-page UI and the first page is great. The
+              second has a different header. The third has different buttons.
+              By page four you&apos;re spending more time fixing
+              inconsistencies than shipping. The AI doesn&apos;t know what
+              it built yesterday.
+            </p>
+          </Reveal>
+          <div className="mt-12 grid gap-4 md:grid-cols-2">
+            <Reveal delay={0.1}>
+              <div className="h-full rounded-lg border border-[var(--border-strong)] bg-[var(--surface)] p-6">
+                <div className="mono flex items-center gap-2 text-[10.5px] uppercase tracking-[0.14em] text-[var(--fg-dim)]">
+                  <span className="inline-block h-1.5 w-1.5 rounded-full bg-[var(--destructive)]" />
+                  Every AI tool today
+                </div>
+                <ul className="mono mt-4 space-y-2.5 text-[13px] text-[var(--fg-muted)]">
+                  <li className="flex items-start gap-2">
+                    <span className="mt-[3px] text-[var(--destructive)]">✕</span>
+                    <span>every page drawn from scratch</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="mt-[3px] text-[var(--destructive)]">✕</span>
+                    <span>components drift between generations — no shared foundation</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="mt-[3px] text-[var(--destructive)]">✕</span>
+                    <span>change a color? edit every page by hand</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="mt-[3px] text-[var(--destructive)]">✕</span>
+                    <span>no Design System — ever</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="mt-[3px] text-[var(--destructive)]">✕</span>
+                    <span>hand off = a pile of pages, not a codebase</span>
+                  </li>
+                </ul>
+              </div>
+            </Reveal>
+            <Reveal delay={0.15}>
+              <div className="card-lift h-full rounded-lg border border-[var(--accent-dim)] bg-[color-mix(in_oklab,var(--surface),var(--accent)_4%)] p-6">
+                <div className="mono flex items-center gap-2 text-[10.5px] uppercase tracking-[0.14em] text-[var(--accent)]">
+                  <span className="inline-block h-1.5 w-1.5 rounded-full bg-[var(--accent)]" />
+                  With Coherent
+                </div>
+                <ul className="mono mt-4 space-y-2.5 text-[13px] text-[var(--fg-muted)]">
+                  <li className="flex items-start gap-2">
+                    <Check size={12} strokeWidth={2.5} className="mt-[4px] shrink-0 text-[var(--accent)]" />
+                    <span>pages built from shared components, not redrawn each time</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Check size={12} strokeWidth={2.5} className="mt-[4px] shrink-0 text-[var(--accent)]" />
+                    <span>edit a component once → every page using it updates</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Check size={12} strokeWidth={2.5} className="mt-[4px] shrink-0 text-[var(--accent)]" />
+                    <span>change a style or token → cascades through every component using it</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Check size={12} strokeWidth={2.5} className="mt-[4px] shrink-0 text-[var(--accent)]" />
+                    <span>Design System grows alongside the UI — no manual DS work</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Check size={12} strokeWidth={2.5} className="mt-[4px] shrink-0 text-[var(--accent)]" />
+                    <span>hand off = product + Design System, shipped together</span>
+                  </li>
+                </ul>
+              </div>
+            </Reveal>
+          </div>
+        </Container>
+      </section>
+
+      {/* [02] WHAT IS COHERENT */}
       <section id="what" className="relative z-[1] border-b border-[var(--border)] bg-[var(--background)]">
         <Container className="py-24">
           <Reveal>
-            <SectionLabel index="01">What is Coherent</SectionLabel>
+            <SectionLabel index="02">What is Coherent</SectionLabel>
           </Reveal>
-          <div className="mt-10 grid gap-10 lg:grid-cols-[0.95fr_1.05fr] lg:gap-16">
+          <div className="mt-10 grid gap-10 lg:grid-cols-2 lg:gap-16">
             <Reveal delay={0.05}>
               <h2 className="mono text-[32px] font-medium leading-[1.12] tracking-[-0.02em] lg:text-[42px]">
-                One plan.
+                One brief.
                 <br />
                 Many pages.
                 <br />
                 One Design System.
               </h2>
-              <p className="mt-6 max-w-md text-[14.5px] leading-[1.65] text-[var(--fg-muted)]">
-                Coherent is an AI design tool for interactive multi-page UI.
-                You describe what you want. It plans the pages, generates them
-                interconnected, and — this is the part no one else does —
-                builds your Design System alongside.
+            </Reveal>
+            <Reveal delay={0.1}>
+              <p className="text-[14.5px] leading-[1.65] text-[var(--fg-muted)]">
+                Coherent is an AI design method for multi-page products. You
+                write a brief. Coherent turns it into a plan, then generates
+                every page — interconnected, with shared components and a
+                Design System that grows as pages land.
               </p>
-              <p className="mt-4 max-w-md text-[14.5px] leading-[1.65] text-[var(--fg-muted)]">
+              <p className="mt-4 text-[14.5px] leading-[1.65] text-[var(--fg-muted)]">
                 Output is a clean Next.js + Tailwind + shadcn/ui project. Show
                 it to stakeholders. Hand it to devs. Or ship it as your real
-                frontend and wire a backend later. Your code, your design
-                system, your atmosphere, no lock-in.
+                frontend and wire a backend later.{' '}
+                <span className="text-[var(--foreground)]">Your code. Your design system. No lock-in.</span>
               </p>
+            </Reveal>
+          </div>
+
+          {/* DS PARALLEL — absorbed from old §04 */}
+          <div id="design-system" className="mt-36 grid gap-10 lg:grid-cols-2 lg:gap-16">
+            <Reveal delay={0.05}>
+              <DSTokensPanel />
             </Reveal>
 
             <Reveal delay={0.1}>
-              <div className="grid gap-4 md:grid-cols-2">
-                <div className="rounded-lg border border-[var(--border-strong)] bg-[var(--surface)] p-5">
-                  <div className="mono text-[10.5px] uppercase tracking-[0.14em] text-[var(--fg-dim)]">
-                    Static mockups / single-page AI tools
-                  </div>
-                  <ul className="mono mt-3 space-y-2.5 text-[13px] text-[var(--fg-muted)]">
-                    <li className="flex items-start gap-2">
-                      <span className="mt-[3px] text-[var(--destructive)]">✕</span>
-                      <span>every page drawn from scratch</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="mt-[3px] text-[var(--destructive)]">✕</span>
-                      <span>header differs between pages</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="mt-[3px] text-[var(--destructive)]">✕</span>
-                      <span>no shared tokens, no cascade</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="mt-[3px] text-[var(--destructive)]">✕</span>
-                      <span>Figma prototype with fake interactions</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="mt-[3px] text-[var(--destructive)]">✕</span>
-                      <span>hand off to dev = start over in code</span>
-                    </li>
-                  </ul>
-                </div>
-                <div className="card-lift rounded-lg border border-[var(--accent-dim)] bg-[color-mix(in_oklab,var(--surface),var(--accent)_4%)] p-5">
-                  <div className="mono text-[10.5px] uppercase tracking-[0.14em] text-[var(--accent)]">
-                    Coherent
-                  </div>
-                  <ul className="mono mt-3 space-y-2.5 text-[13px] text-[var(--fg-muted)]">
-                    <li className="flex items-start gap-2">
-                      <Check size={12} strokeWidth={2.5} className="mt-[4px] shrink-0 text-[var(--accent)]" />
-                      <span>one plan, many interconnected pages</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <Check size={12} strokeWidth={2.5} className="mt-[4px] shrink-0 text-[var(--accent)]" />
-                      <span>shared components with stable IDs</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <Check size={12} strokeWidth={2.5} className="mt-[4px] shrink-0 text-[var(--accent)]" />
-                      <span>Design System grows alongside the UI</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <Check size={12} strokeWidth={2.5} className="mt-[4px] shrink-0 text-[var(--accent)]" />
-                      <span>real React — router, state, animations work</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <Check size={12} strokeWidth={2.5} className="mt-[4px] shrink-0 text-[var(--accent)]" />
-                      <span>hand off to dev = they get the DS too</span>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </Reveal>
-          </div>
-        </Container>
-      </section>
-
-      {/* DESIGN SYSTEM PARALLEL */}
-      <section id="design-system" className="relative z-[1] border-b border-[var(--border)] bg-[var(--background)]">
-        <Container className="py-28">
-          <Reveal>
-            <SectionLabel index="02">Design System, parallel</SectionLabel>
-          </Reveal>
-          <div className="mt-8 grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16">
-            <Reveal delay={0.05}>
-              <h2 className="mono text-[34px] font-medium leading-[1.08] tracking-[-0.02em] lg:text-[44px]">
+              <h3 className="mono text-[32px] font-medium leading-[1.12] tracking-[-0.02em] lg:text-[42px]">
                 As you describe
                 <br />
                 the UI, a Design System
                 <br />
                 <span className="text-[var(--accent)]">builds itself.</span>
-              </h2>
-              <p className="mt-6 max-w-md text-[14.5px] leading-[1.65] text-[var(--fg-muted)]">
-                Every component you use gets registered with a stable ID. Every
-                token you touch — a color, a font, a spacing step — lands in
+              </h3>
+              <p className="mt-6 text-[14.5px] leading-[1.65] text-[var(--fg-muted)]">
+                Every component gets a stable ID. Every token you touch — a
+                color, a font, a spacing step — lands in
                 <span className="mono text-[var(--foreground)]"> design-system.config.ts</span>.
-                By the time the third page is generated, you have a living DS
-                you can open, audit, and edit.
+                By page three, you have a living DS you can open, audit, and edit.
               </p>
-              <p className="mt-4 max-w-md text-[14.5px] leading-[1.65] text-[var(--fg-muted)]">
-                This is the thing no one else does. v0 gives you a page. Figma
-                gives you a mockup. Coherent gives you a page and a Design
-                System.
+              <p className="mt-4 text-[14.5px] leading-[1.65] text-[var(--fg-muted)]">
+                v0 gives you a page. Figma gives you a mockup. Coherent gives
+                you a page <span className="text-[var(--foreground)]">and</span> a Design System.
               </p>
-            </Reveal>
-
-            <Reveal delay={0.1}>
-              <div className="grid gap-4 md:grid-cols-2">
-                <div className="rounded-lg border border-[var(--border-strong)] bg-[var(--surface)] p-5">
-                  <div className="mono flex items-center gap-2 text-[10.5px] uppercase tracking-[0.14em] text-[var(--fg-dim)]">
-                    <span className="inline-block h-1.5 w-1.5 rounded-full bg-[var(--accent)]" />
-                    pages generated
-                  </div>
-                  <ul className="mono mt-3 space-y-1.5 text-[12.5px]">
-                    {[
-                      '/ · landing',
-                      '/pricing',
-                      '/dashboard',
-                      '/dashboard/[id]',
-                      '/settings',
-                    ].map((p) => (
-                      <li
-                        key={p}
-                        className="flex items-center gap-2 text-[var(--foreground)]"
-                      >
-                        <Check size={11} strokeWidth={2.25} className="text-[var(--accent)]" />
-                        <span>{p}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-                <div className="rounded-lg border border-[var(--border-strong)] bg-[var(--surface)] p-5">
-                  <div className="mono flex items-center gap-2 text-[10.5px] uppercase tracking-[0.14em] text-[var(--fg-dim)]">
-                    <span className="inline-block h-1.5 w-1.5 rounded-full bg-[var(--accent)]" />
-                    components · stable IDs
-                  </div>
-                  <ul className="mono mt-3 space-y-1.5 text-[12.5px]">
-                    {[
-                      { id: 'CID-001', name: 'SiteNav', uses: 5 },
-                      { id: 'CID-002', name: 'Button', uses: 12 },
-                      { id: 'CID-003', name: 'StatCard', uses: 4 },
-                      { id: 'CID-004', name: 'FilterBar', uses: 3 },
-                      { id: 'CID-005', name: 'EmptyState', uses: 2 },
-                    ].map((c) => (
-                      <li key={c.id} className="flex items-center gap-2">
-                        <span className="text-[var(--accent)]">{c.id}</span>
-                        <span className="text-[var(--foreground)]">
-                          {c.name}
-                        </span>
-                        <span className="text-[var(--fg-dim)]">
-                          · used in {c.uses}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-                <div className="col-span-full rounded-lg border border-[var(--border-strong)] bg-[var(--surface)] p-5">
-                  <div className="mono flex items-center gap-2 text-[10.5px] uppercase tracking-[0.14em] text-[var(--fg-dim)]">
-                    <span className="inline-block h-1.5 w-1.5 rounded-full bg-[var(--accent)]" />
-                    tokens · design-system.config.ts
-                  </div>
-                  <div className="mono mt-3 grid grid-cols-2 gap-x-6 gap-y-1.5 text-[12px] md:grid-cols-3">
-                    {[
-                      ['--accent', '#3ecf8e'],
-                      ['--bg', '#0a0a0a'],
-                      ['--fg', '#ededed'],
-                      ['--radius-md', '6px'],
-                      ['--radius-lg', '8px'],
-                      ['--font-body', 'Geist Sans'],
-                      ['--font-mono', 'Geist Mono'],
-                      ['--space-base', '4px'],
-                      ['--ease-out', 'cubic-bezier(.25,1,.5,1)'],
-                    ].map(([k, v]) => (
-                      <div key={k} className="flex items-center justify-between gap-2">
-                        <span className="text-[var(--accent)]">{k}</span>
-                        <span className="truncate text-[var(--foreground)]">
-                          {v}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
             </Reveal>
           </div>
         </Container>
       </section>
 
-      {/* FULL CONTROL / CASCADE */}
-      <section id="control" className="relative z-[1] border-b border-[var(--border)] bg-[var(--background)]">
+      {/* [03] HOW IT WORKS */}
+      <section id="how" className="relative z-[1] border-b border-[var(--border)] bg-[var(--background)]">
         <Container className="py-28">
           <Reveal>
-            <SectionLabel index="03">Full control</SectionLabel>
+            <SectionLabel index="03">How it works</SectionLabel>
           </Reveal>
-          <div className="mt-8 grid gap-10 lg:grid-cols-[0.95fr_1.05fr] lg:gap-16">
-            <Reveal delay={0.05}>
-              <h2 className="mono text-[34px] font-medium leading-[1.08] tracking-[-0.02em] lg:text-[44px]">
-                Change one thing.
-                <br />
-                <span className="text-[var(--accent)]">It updates everywhere.</span>
-              </h2>
-              <p className="mt-6 max-w-md text-[14.5px] leading-[1.65] text-[var(--fg-muted)]">
-                Edit a token in plain English —{' '}
-                <span className="mono text-[var(--foreground)]">
-                  &quot;make the accent softer, more teal&quot;
-                </span>
-                . Or open{' '}
-                <span className="mono text-[var(--foreground)]">
-                  design-system.config.ts
-                </span>{' '}
-                and change the hex. Either way, every page that uses that
-                token updates. Same for components: edit{' '}
-                <span className="mono text-[var(--foreground)]">Button</span>{' '}
-                once, every instance on every page follows.
-              </p>
-              <ul className="mono mt-6 space-y-2.5 text-[13px] text-[var(--fg-muted)]">
-                <li className="flex items-start gap-2.5">
-                  <ArrowRight size={13} strokeWidth={2} className="mt-[3px] shrink-0 text-[var(--accent)]" />
-                  Typography, colors, spacing, radius, motion — all tokens
-                </li>
-                <li className="flex items-start gap-2.5">
-                  <ArrowRight size={13} strokeWidth={2} className="mt-[3px] shrink-0 text-[var(--accent)]" />
-                  Components edited once, cascade across every page
-                </li>
-                <li className="flex items-start gap-2.5">
-                  <ArrowRight size={13} strokeWidth={2} className="mt-[3px] shrink-0 text-[var(--accent)]" />
-                  Describe the change in English, or write the code — your call
-                </li>
-                <li className="flex items-start gap-2.5">
-                  <ArrowRight size={13} strokeWidth={2} className="mt-[3px] shrink-0 text-[var(--accent)]" />
-                  The DS is a file, not a black box — you own it
-                </li>
-              </ul>
-            </Reveal>
-
-            <Reveal delay={0.1}>
-              <div className="overflow-hidden rounded-lg border border-[var(--border-strong)] bg-[var(--surface)] shadow-[0_24px_60px_-30px_rgba(0,0,0,0.6)]">
-                <div className="flex items-center justify-between border-b border-[var(--border)] bg-[var(--surface-2)] px-3 py-2">
-                  <span className="mono text-[12px] text-[var(--fg-muted)]">
-                    cascade · one edit
-                  </span>
-                  <span className="mono text-[10.5px] text-[var(--accent)]">
-                    5 files updated
-                  </span>
+          <Reveal delay={0.05}>
+            <h2 className="mono mt-8 max-w-3xl text-[34px] font-medium leading-[1.08] tracking-[-0.02em] lg:text-[44px]">
+              See it in action.
+            </h2>
+            <p className="mt-5 max-w-2xl text-[14.5px] leading-[1.65] text-[var(--fg-muted)]">
+              Five commands from empty folder to a deployable multi-page UI.
+              No templates to clone, no design system to bootstrap.
+            </p>
+          </Reveal>
+          <div className="mt-12 space-y-6">
+            {HOW_STEPS.map((s, i) => (
+              <Reveal key={s.step} delay={0.05 + i * 0.04}>
+                <div className="grid gap-4 md:grid-cols-[60px_1fr_1.2fr] md:gap-6">
+                  <div className="mono flex items-start pt-1 text-[20px] font-medium text-[var(--accent)] md:pt-6">
+                    {s.step}
+                  </div>
+                  <div>
+                    <div className="mono text-[10.5px] uppercase tracking-[0.14em] text-[var(--fg-dim)]">
+                      {s.label}
+                    </div>
+                    <div className="mono mt-2 rounded-md border border-[var(--border-strong)] bg-[var(--surface)] px-3 py-2.5 text-[13px]">
+                      <span className="text-[var(--accent)]">$</span>{' '}
+                      <span className="text-[var(--foreground)]">{s.cmd}</span>
+                    </div>
+                  </div>
+                  <p className="pt-1 text-[13.5px] leading-[1.65] text-[var(--fg-muted)] md:pt-6">
+                    {s.body}
+                  </p>
                 </div>
-                <div className="p-5">
-                  <div className="mono text-[11px] uppercase tracking-[0.14em] text-[var(--fg-dim)]">
-                    you
-                  </div>
-                  <div className="mono mt-1 rounded border border-[var(--border)] bg-[var(--elevated)] px-3 py-2 text-[13px] text-[var(--foreground)]">
-                    <span className="text-[var(--accent)]">edit</span>{' '}
-                    --radius-md: <span className="text-[var(--destructive)] line-through">6px</span>{' '}
-                    → <span className="text-[var(--accent)]">12px</span>
-                  </div>
-
-                  <div className="mono mt-5 text-[11px] uppercase tracking-[0.14em] text-[var(--fg-dim)]">
-                    coherent, automatically
-                  </div>
-                  <div className="mono mt-2 space-y-1 text-[12.5px]">
-                    {[
-                      'components/ui/Button.tsx',
-                      'components/ui/Card.tsx',
-                      'components/ui/Input.tsx',
-                      'components/shared/StatCard.tsx',
-                      'components/shared/FilterBar.tsx',
-                    ].map((f, i) => (
-                      <div
-                        key={f}
-                        className="flex items-center gap-2 text-[var(--fg-muted)]"
-                        style={{
-                          animation: 'fade-up 0.4s cubic-bezier(0.25,1,0.5,1) both',
-                          animationDelay: `${200 + i * 80}ms`,
-                        }}
-                      >
-                        <Check size={11} strokeWidth={2.25} className="text-[var(--accent)]" />
-                        <span className="truncate">{f}</span>
-                        <span className="ml-auto text-[var(--fg-dim)]">updated</span>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="mono mt-5 text-[11px] uppercase tracking-[0.14em] text-[var(--fg-dim)]">
-                    result
-                  </div>
-                  <div className="mono mt-2 rounded border border-[var(--accent-dim)] bg-[color-mix(in_oklab,var(--surface),var(--accent)_6%)] px-3 py-2 text-[12.5px] text-[var(--foreground)]">
-                    every rounded-md surface on all 5 pages · 12px radius ·{' '}
-                    <span className="text-[var(--accent)]">0 hand edits</span>
-                  </div>
-                </div>
-              </div>
-            </Reveal>
+              </Reveal>
+            ))}
           </div>
         </Container>
       </section>
 
-      {/* ATMOSPHERES */}
+      {/* [04] TWO WAYS TO BUILD */}
+      <section id="two-ways" className="relative z-[1] border-b border-[var(--border)] bg-[var(--background)]">
+        <Container className="py-28">
+          <Reveal>
+            <SectionLabel index="04">Two ways to build</SectionLabel>
+          </Reveal>
+          <Reveal delay={0.05}>
+            <h2 className="mono mt-8 max-w-3xl text-[34px] font-medium leading-[1.08] tracking-[-0.02em] lg:text-[44px]">
+              Use the terminal.
+              <br />
+              <span className="text-[var(--fg-dim)]">Or your editor. Or both.</span>
+            </h2>
+          </Reveal>
+          <div className="mt-12 grid gap-4 lg:grid-cols-2">
+            <Reveal delay={0.05}>
+              <div className="flex h-full flex-col gap-4 rounded-lg border border-[var(--border-strong)] bg-[var(--surface)] p-6">
+                <div className="mono flex items-center gap-2 text-[10.5px] uppercase tracking-[0.14em] text-[var(--accent)]">
+                  <span className="inline-block h-1.5 w-1.5 rounded-full bg-[var(--accent)]" />
+                  CLI
+                </div>
+                <p className="text-[13.5px] leading-[1.6] text-[var(--fg-muted)]">
+                  Run commands in your terminal. Each goes through the full
+                  pipeline: AI generation → component reuse → validation →
+                  auto-fix.
+                </p>
+                <div className="mono mt-auto space-y-2 text-[13px]">
+                  {['coherent init my-app', 'coherent chat "add a dashboard"', 'coherent preview'].map((c) => (
+                    <div key={c} className="rounded-md border border-[var(--border)] bg-[var(--elevated)] px-3 py-2">
+                      <span className="text-[var(--accent)]">$</span>{' '}
+                      <span className="text-[var(--foreground)]">{c}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </Reveal>
+            <Reveal delay={0.1}>
+              <div className="flex h-full flex-col gap-4 rounded-lg border border-[var(--border-strong)] bg-[var(--surface)] p-6">
+                <div className="mono flex items-center gap-2 text-[10.5px] uppercase tracking-[0.14em] text-[var(--accent)]">
+                  <span className="inline-block h-1.5 w-1.5 rounded-full bg-[var(--accent)]" />
+                  Cursor / Claude Code / any AI editor
+                </div>
+                <p className="text-[13.5px] leading-[1.6] text-[var(--fg-muted)]">
+                  Describe changes in your editor&apos;s chat. Coherent provides
+                  context via{' '}
+                  <span className="mono text-[var(--foreground)]">.cursorrules</span>{' '}
+                  and{' '}
+                  <span className="mono text-[var(--foreground)]">CLAUDE.md</span>{' '}
+                  — your AI knows about shared components, design tokens, and
+                  quality rules.
+                </p>
+                <div className="mono mt-auto space-y-2 text-[12.5px]">
+                  <div className="mono text-[10.5px] uppercase tracking-[0.14em] text-[var(--fg-dim)]">
+                    Example prompts
+                  </div>
+                  {[
+                    '"make the hero headline larger"',
+                    '"add hover shadow to the feature cards"',
+                    '"change the footer layout to two columns"',
+                  ].map((p) => (
+                    <div key={p} className="rounded-md border border-[var(--border)] bg-[var(--elevated)] px-3 py-2 text-[var(--foreground)]">
+                      {p}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </Reveal>
+          </div>
+          <Reveal delay={0.15}>
+            <p className="mono mt-8 max-w-3xl text-[12.5px] leading-[1.7] text-[var(--fg-muted)]">
+              Different tools, shared foundation. CLI runs the full pipeline —
+              generation, reuse, validation, auto-fix. Editor chat gives you
+              speed with AI-powered design-system context. Run{' '}
+              <span className="text-[var(--accent)]">coherent check</span>{' '}
+              anytime to scan quality, shared components, and internal links.
+            </p>
+          </Reveal>
+        </Container>
+      </section>
+
+      {/* [07] ATMOSPHERES */}
       <section id="atmospheres" className="relative z-[1] border-b border-[var(--border)] bg-[var(--background)]">
         <Container className="py-28">
           <Reveal>
-            <SectionLabel index="04">Atmospheres (optional)</SectionLabel>
+            <SectionLabel index="05">Atmospheres (optional)</SectionLabel>
           </Reveal>
           <Reveal delay={0.05}>
             <h2 className="mono mt-8 max-w-3xl text-[34px] font-medium leading-[1.08] tracking-[-0.02em] lg:text-[44px]">
@@ -644,10 +643,7 @@ export default function LandingPage() {
             {ATMOSPHERES.map((a) => (
               <StaggerItem key={a.name}>
                 <div className="card-lift flex h-full flex-col gap-4 rounded-lg border border-[var(--border-strong)] bg-[var(--surface)] p-5">
-                  <div
-                    className="h-28 rounded-md border border-[var(--border)]"
-                    style={{ background: a.preview }}
-                  />
+                  <AtmospherePreview name={a.name} />
                   <div>
                     <div className="mono text-[10.5px] uppercase tracking-[0.14em] text-[var(--fg-dim)]">
                       atmosphere
@@ -665,173 +661,187 @@ export default function LandingPage() {
                 </div>
               </StaggerItem>
             ))}
-          </Stagger>
-
-          <Reveal delay={0.15}>
-            <div className="mono mt-10 rounded-lg border border-dashed border-[var(--border-strong)] bg-[var(--surface)] p-5 text-[12.5px] leading-[1.7] text-[var(--fg-muted)]">
-              <span className="text-[var(--foreground)]">Your own vibe?</span>{' '}
-              Skip the starter kits. Define your atmosphere in{' '}
-              <span className="text-[var(--accent)]">design-system.config.ts</span>{' '}
-              — your fonts, your palette, your rhythm. Coherent generates
-              every page against yours. Save it, share it, it becomes the 4th atmosphere.
-            </div>
-          </Reveal>
-        </Container>
-      </section>
-
-      {/* NUMBERS */}
-      <section className="relative z-[1] border-b border-[var(--border)] bg-[var(--background)]">
-        <Container className="py-24">
-          <Reveal>
-            <SectionLabel index="05">Numbers</SectionLabel>
-          </Reveal>
-          <Reveal delay={0.05}>
-            <div className="mt-8 grid grid-cols-2 divide-x divide-[var(--border)] border border-[var(--border-strong)] bg-[var(--surface)] md:grid-cols-4">
-              {STATS.map((s) => (
-                <div key={s.label} className="px-5 py-5">
+            <StaggerItem>
+              <div className="card-lift flex h-full flex-col gap-4 rounded-lg border border-dashed border-[var(--border-strong)] bg-[var(--surface)] p-5">
+                <div
+                  className="flex h-36 flex-col items-center justify-center gap-2 overflow-hidden rounded-md border border-dashed border-[var(--border)] bg-[var(--elevated)]"
+                >
+                  <Plus size={22} strokeWidth={1.5} className="text-[var(--accent)]" />
+                  <span className="mono text-[10.5px] uppercase tracking-[0.14em] text-[var(--fg-dim)]">
+                    define your own
+                  </span>
+                </div>
+                <div>
                   <div className="mono text-[10.5px] uppercase tracking-[0.14em] text-[var(--fg-dim)]">
-                    {s.label}
+                    atmosphere
                   </div>
-                  <div className="mono mt-1.5 text-[26px] font-medium tabular-nums text-[var(--foreground)]">
-                    <CountUp
-                      value={s.value}
-                      suffix={s.suffix}
-                      format={s.format}
-                    />
-                  </div>
-                  <div className="mono mt-1 text-[11.5px] text-[var(--fg-dim)]">
-                    {s.note}
+                  <div className="mono mt-1 text-[16px] font-medium text-[var(--foreground)]">
+                    Your own vibe
                   </div>
                 </div>
-              ))}
-            </div>
-          </Reveal>
-        </Container>
-      </section>
-
-      {/* WORKFLOW */}
-      <section className="relative z-[1] border-b border-[var(--border)] bg-[var(--background)]">
-        <Container className="py-28">
-          <Reveal>
-            <SectionLabel index="06">Under the hood</SectionLabel>
-          </Reveal>
-          <Reveal delay={0.05}>
-            <p className="mt-6 max-w-2xl text-[14px] leading-[1.65] text-[var(--fg-muted)]">
-              Working with design is done in plain English. But if you want to
-              see the engine — CLI commands, config file shape — here it is.
-              You never need to type any of this to use Coherent.
-            </p>
-          </Reveal>
-          <div className="mt-8 grid gap-10 lg:grid-cols-[1fr_1fr] lg:gap-12">
-            <Reveal delay={0.08}>
-              <h2 className="mono text-[30px] font-medium leading-[1.12] tracking-[-0.02em]">
-                CLI-first for devs.
-                <br />
-                English-first for designers.
-              </h2>
-              <ul className="mono mt-8 space-y-3 text-[13px] text-[var(--fg-muted)]">
-                {WORKFLOW.map((w) => (
-                  <li key={w.cmd} className="flex items-start gap-3">
-                    <span className="text-[var(--accent)]">
-                      {w.step.padStart(2, '0')}
-                    </span>
-                    <span className="flex-1">
-                      <span className="text-[var(--foreground)]">{w.cmd}</span>
-                      <span className="text-[var(--fg-dim)]"> — </span>
-                      <span>{w.body}</span>
-                    </span>
-                  </li>
-                ))}
-              </ul>
-              <p className="mt-8 max-w-md text-[13.5px] leading-[1.65] text-[var(--fg-muted)]">
-                Output is a clean Next.js project. Standard React you can deploy
-                to Vercel, Netlify, Fly, self-host.{' '}
-                <span className="text-[var(--foreground)]">No lock-in.</span>
-              </p>
-            </Reveal>
-
-            <Reveal delay={0.1}>
-              <div className="overflow-hidden rounded-lg border border-[var(--border-strong)] bg-[var(--surface)] shadow-[0_24px_60px_-30px_rgba(0,0,0,0.6)]">
-                <div className="flex items-center justify-between border-b border-[var(--border)] bg-[var(--surface-2)] px-3 py-2">
-                  <span className="mono text-[12px] text-[var(--fg-muted)]">
-                    design-system.config.ts
-                  </span>
-                  <span className="mono text-[11px] text-[var(--fg-dim)]">
-                    ts
-                  </span>
-                </div>
-                <div className="mono overflow-x-auto px-4 py-4 text-[13px] leading-[1.7]">
-                  <div className="text-[var(--fg-dim)]">
-                    // picked once · applied everywhere
-                  </div>
-                  <div>
-                    <span className="text-[#c678dd]">export default</span>{' '}
-                    defineAtmosphere({'{'}
-                  </div>
-                  <div>
-                    &nbsp;&nbsp;<span className="text-[#61afef]">id</span>:{' '}
-                    <span className="text-[#98c379]">&apos;console&apos;</span>,
-                  </div>
-                  <div>
-                    &nbsp;&nbsp;<span className="text-[#61afef]">typography</span>:{' '}
-                    {'{'}
-                  </div>
-                  <div>
-                    &nbsp;&nbsp;&nbsp;&nbsp;heading:{' '}
-                    <span className="text-[#98c379]">&apos;Geist Mono&apos;</span>,
-                  </div>
-                  <div>
-                    &nbsp;&nbsp;&nbsp;&nbsp;body:{' '}
-                    <span className="text-[#98c379]">&apos;Geist Sans&apos;</span>,
-                  </div>
-                  <div>
-                    &nbsp;&nbsp;&nbsp;&nbsp;scale: <span className="text-[#e5c07b]">1.2</span>,
-                  </div>
-                  <div>&nbsp;&nbsp;{'}'},</div>
-                  <div>
-                    &nbsp;&nbsp;<span className="text-[#61afef]">colors</span>:{' '}
-                    {'{'} accent:{' '}
-                    <span className="text-[var(--accent)]">
-                      &apos;#3ecf8e&apos;
-                    </span>
-                    , bg: <span className="text-[#98c379]">&apos;dark&apos;</span>{' '}
-                    {'}'},
-                  </div>
-                  <div>
-                    &nbsp;&nbsp;<span className="text-[#61afef]">spacing</span>:{' '}
-                    <span className="text-[#98c379]">&apos;tight&apos;</span>,
-                  </div>
-                  <div>
-                    &nbsp;&nbsp;<span className="text-[#61afef]">motion</span>:{' '}
-                    <span className="text-[#98c379]">&apos;ease-out-quart&apos;</span>,
-                  </div>
-                  <div>
-                    &nbsp;&nbsp;<span className="text-[#61afef]">layout</span>:{' '}
-                    <span className="text-[#98c379]">
-                      &apos;grid-dense&apos;
-                    </span>
-                    ,
-                  </div>
-                  <div>
-                    &nbsp;&nbsp;<span className="text-[#61afef]">mood</span>:{' '}
-                    <span className="text-[#98c379]">
-                      &apos;tools for people who read docs&apos;
-                    </span>
-                    ,
-                  </div>
-                  <div>{'}'})</div>
+                <p className="text-[13px] leading-[1.55] text-[var(--fg-muted)]">
+                  Skip the starter kits. Define fonts, palette, rhythm in
+                  <span className="mono text-[var(--foreground)]"> design-system.config.ts</span>.
+                  Save it — it becomes your 6th atmosphere.
+                </p>
+                <div className="mono text-[11px] text-[var(--fg-dim)]">
+                  <span className="text-[var(--foreground)]">Fit:</span> anything you want it to be
                 </div>
               </div>
-            </Reveal>
-          </div>
+            </StaggerItem>
+          </Stagger>
         </Container>
       </section>
 
-      {/* FAQ */}
+      {/* [08] GETTING STARTED */}
+      <section id="start" className="relative z-[1] border-b border-[var(--border)] bg-[var(--background)]">
+        <Container className="py-28">
+          <Reveal>
+            <SectionLabel index="06">Getting started</SectionLabel>
+          </Reveal>
+          <Reveal delay={0.05}>
+            <h2 className="mono mt-8 max-w-3xl text-[38px] font-medium leading-[1.08] tracking-[-0.02em] lg:text-[48px]">
+              Try it in 60 seconds.
+            </h2>
+          </Reveal>
+          <Reveal delay={0.1}>
+            <div className="mt-12 overflow-hidden rounded-lg border border-[var(--border-strong)] bg-[var(--surface)] shadow-[0_24px_60px_-30px_rgba(0,0,0,0.6)]">
+              <div className="flex items-center justify-between border-b border-[var(--border)] bg-[var(--surface-2)] px-4 py-2.5">
+                <span className="mono text-[11px] uppercase tracking-[0.14em] text-[var(--fg-dim)]">
+                  terminal
+                </span>
+                <CopyChip
+                  text={
+                    'npm install -g @getcoherent/cli\ncoherent init my-app\ncd my-app\ncoherent chat "create a SaaS app with dashboard, settings, and pricing pages"\ncoherent preview'
+                  }
+                />
+              </div>
+              <div className="mono space-y-3 px-5 py-5 text-[13.5px] leading-[1.6]">
+                <div>
+                  <span className="text-[var(--accent)]">$</span>{' '}
+                  <span className="text-[var(--foreground)]">
+                    npm install -g @getcoherent/cli
+                  </span>
+                </div>
+                <div>
+                  <span className="text-[var(--accent)]">$</span>{' '}
+                  <span className="text-[var(--foreground)]">coherent init my-app</span>
+                </div>
+                <div>
+                  <span className="text-[var(--accent)]">$</span>{' '}
+                  <span className="text-[var(--foreground)]">cd my-app</span>
+                </div>
+                <div>
+                  <span className="text-[var(--accent)]">$</span>{' '}
+                  <span className="text-[var(--foreground)]">
+                    coherent chat &quot;create a SaaS app with dashboard, settings,
+                    and pricing pages&quot;
+                  </span>
+                </div>
+                <div>
+                  <span className="text-[var(--accent)]">$</span>{' '}
+                  <span className="text-[var(--foreground)]">coherent preview</span>
+                </div>
+              </div>
+            </div>
+          </Reveal>
+          <Reveal delay={0.15}>
+            <p className="mt-8 max-w-2xl text-[13.5px] leading-[1.65] text-[var(--fg-muted)]">
+              That&apos;s it. Five commands. A complete multi-page prototype
+              with shared components and a Design System. Bring your own
+              Claude or GPT key — typical cost per page:{' '}
+              <span className="mono text-[var(--foreground)]">$0.01–$0.03</span>.
+            </p>
+          </Reveal>
+        </Container>
+      </section>
+
+      {/* [09] SPONSOR */}
+      <section id="sponsor" className="relative z-[1] border-b border-[var(--border)] bg-[var(--background)]">
+        <Container className="py-28">
+          <Reveal>
+            <SectionLabel index="07">Open source</SectionLabel>
+          </Reveal>
+          <Reveal delay={0.05}>
+            <h2 className="mono mt-8 max-w-3xl text-[34px] font-medium leading-[1.08] tracking-[-0.02em] lg:text-[44px]">
+              Free. Forever. MIT.
+            </h2>
+            <p className="mt-5 max-w-2xl text-[14.5px] leading-[1.65] text-[var(--fg-muted)]">
+              Everything&apos;s in the open source tier. No paid gates, no
+              usage limits. Sponsoring is optional — fuel for shipping the
+              atmosphere engine faster.
+            </p>
+          </Reveal>
+
+          <Stagger className="mt-12 grid gap-4 lg:grid-cols-2" gap={0.08}>
+            {PRICING.map((p) => (
+              <StaggerItem key={p.name}>
+                <div
+                  className={`card-lift relative flex h-full flex-col gap-6 rounded-lg border p-6 ${
+                    p.featured
+                      ? 'border-[var(--border-strong)] bg-[var(--surface)]'
+                      : 'border-[var(--accent-dim)] bg-[color-mix(in_oklab,var(--surface),var(--accent)_6%)]'
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="mono text-[13px] uppercase tracking-[0.14em] text-[var(--fg-dim)]">
+                      {p.name}
+                    </span>
+                    {!p.featured && (
+                      <SiteBadge tone="accent">everything unlocked</SiteBadge>
+                    )}
+                  </div>
+                  <div>
+                    <div className="mono flex items-baseline gap-1 text-[var(--foreground)]">
+                      <span className="text-[40px] font-medium leading-none tabular-nums">
+                        {p.price}
+                      </span>
+                      <span className="text-[13px] text-[var(--fg-dim)]">
+                        {p.period}
+                      </span>
+                    </div>
+                    <p className="mt-2 text-[13px] leading-[1.5] text-[var(--fg-muted)]">
+                      {p.tagline}
+                    </p>
+                  </div>
+                  <ul className="mono space-y-2.5 text-[13px] text-[var(--fg-muted)]">
+                    {p.features.map((f) => (
+                      <li key={f} className="flex items-start gap-2">
+                        <Check
+                          size={12}
+                          strokeWidth={2.5}
+                          className="mt-[4px] shrink-0 text-[var(--accent)]"
+                        />
+                        <span>{f}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <Link
+                    href={p.href}
+                    {...(/^https?:\/\//.test(p.href)
+                      ? { target: '_blank', rel: 'noopener noreferrer' }
+                      : {})}
+                    className={
+                      !p.featured
+                        ? 'btn-primary-site mono mt-auto inline-flex h-10 items-center justify-center gap-2 rounded-md px-4 text-[13px]'
+                        : 'press mono mt-auto inline-flex h-10 items-center justify-center gap-2 rounded-md border border-[var(--border-strong)] bg-[var(--surface)] px-4 text-[13px] text-[var(--foreground)] outline-none hover:border-[var(--fg-dim)] hover:bg-[var(--surface-2)]'
+                    }
+                  >
+                    {p.cta}
+                    <ArrowRight size={13} strokeWidth={2} />
+                  </Link>
+                </div>
+              </StaggerItem>
+            ))}
+          </Stagger>
+        </Container>
+      </section>
+
+      {/* [10] FAQ */}
       <section id="faq" className="relative z-[1] border-b border-[var(--border)] bg-[var(--background)]">
         <Container className="py-28">
           <Reveal>
-            <SectionLabel index="07">Questions</SectionLabel>
+            <SectionLabel index="08">Questions</SectionLabel>
           </Reveal>
           <Reveal delay={0.05}>
             <h2 className="mono mt-8 max-w-3xl text-[32px] font-medium leading-[1.12] tracking-[-0.02em] lg:text-[42px]">
@@ -869,6 +879,8 @@ export default function LandingPage() {
               </span>
               <Link
                 href="https://github.com/skovtun/coherent-design-method/issues"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="press inline-flex items-center gap-1.5 rounded-md border border-[var(--border-strong)] bg-[var(--elevated)] px-3 py-1.5 text-[12px] text-[var(--foreground)] outline-none hover:border-[var(--fg-dim)]"
               >
                 <Package size={12} strokeWidth={2} />
@@ -880,94 +892,15 @@ export default function LandingPage() {
         </Container>
       </section>
 
-      {/* PRICING */}
-      <section id="pricing" className="relative z-[1] border-b border-[var(--border)] bg-[var(--background)]">
-        <Container className="py-28">
-          <Reveal>
-            <SectionLabel index="08">Pricing</SectionLabel>
-          </Reveal>
-          <Reveal delay={0.05}>
-            <h2 className="mono mt-8 max-w-3xl text-[34px] font-medium leading-[1.08] tracking-[-0.02em] lg:text-[44px]">
-              Free. Open. MIT.
-            </h2>
-            <p className="mt-5 max-w-2xl text-[14.5px] leading-[1.65] text-[var(--fg-muted)]">
-              Coherent is open source. No paid tier, no gated atmospheres, no
-              usage limits. You bring your own Claude or GPT API key. Typical
-              page generation cost:{' '}
-              <span className="mono text-[var(--foreground)]">$0.01–$0.03</span>.
-            </p>
-          </Reveal>
-
-          <Stagger className="mt-12 grid gap-4 md:grid-cols-2" gap={0.08}>
-            {PRICING.map((p) => (
-              <StaggerItem key={p.name}>
-                <div
-                  className={`card-lift relative flex h-full flex-col gap-6 rounded-lg border p-6 ${
-                    p.featured
-                      ? 'border-[var(--accent-dim)] bg-[color-mix(in_oklab,var(--surface),var(--accent)_4%)]'
-                      : 'border-[var(--border-strong)] bg-[var(--surface)]'
-                  }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="mono text-[13px] uppercase tracking-[0.14em] text-[var(--fg-dim)]">
-                      {p.name}
-                    </span>
-                    {p.featured && (
-                      <SiteBadge tone="accent">recommended</SiteBadge>
-                    )}
-                  </div>
-                  <div>
-                    <div className="mono flex items-baseline gap-1 text-[var(--foreground)]">
-                      <span className="text-[36px] font-medium tabular-nums">
-                        {p.price}
-                      </span>
-                      <span className="text-[13px] text-[var(--fg-dim)]">
-                        {p.period}
-                      </span>
-                    </div>
-                    <p className="mt-2 text-[13px] leading-[1.5] text-[var(--fg-muted)]">
-                      {p.tagline}
-                    </p>
-                  </div>
-                  <ul className="mono space-y-2.5 text-[13px] text-[var(--fg-muted)]">
-                    {p.features.map((f) => (
-                      <li key={f} className="flex items-start gap-2">
-                        <ArrowRight
-                          size={12}
-                          strokeWidth={2}
-                          className="mt-[4px] shrink-0 text-[var(--accent)]"
-                        />
-                        <span>{f}</span>
-                      </li>
-                    ))}
-                  </ul>
-                  <Link
-                    href={p.href}
-                    className={
-                      p.featured
-                        ? 'btn-primary-site mono inline-flex h-10 items-center justify-center gap-2 rounded-md px-4 text-[13px]'
-                        : 'press mono inline-flex h-10 items-center justify-center gap-2 rounded-md border border-[var(--border-strong)] bg-[var(--surface)] px-4 text-[13px] text-[var(--foreground)] outline-none hover:border-[var(--fg-dim)] hover:bg-[var(--surface-2)]'
-                    }
-                  >
-                    {p.cta}
-                    <ArrowRight size={13} strokeWidth={2} />
-                  </Link>
-                </div>
-              </StaggerItem>
-            ))}
-          </Stagger>
-        </Container>
-      </section>
-
-      {/* CTA */}
+      {/* FINAL CTA */}
       <section id="install" className="relative z-[1] overflow-hidden border-b border-[var(--border)] bg-[var(--background)]">
         <AmbientOrbs />
         <Container className="relative py-28 text-center">
           <Reveal>
             <h2 className="mono mx-auto max-w-3xl text-[38px] font-medium leading-[1.08] tracking-[-0.02em] lg:text-[52px]">
-              One command. One atmosphere.
+              One brief.
               <br />
-              <span className="text-[var(--fg-dim)]">Whole app in hours.</span>
+              <span className="text-[var(--fg-dim)]">Whole UI in hours.</span>
             </h2>
           </Reveal>
           <Reveal delay={0.1}>
@@ -979,10 +912,7 @@ export default function LandingPage() {
           </Reveal>
           <Reveal delay={0.2}>
             <div className="mono mt-6 text-[11.5px] text-[var(--fg-dim)]">
-              or install per-project ·{' '}
-              <span className="text-[var(--fg-muted)]">
-                npm i -D @getcoherent/cli
-              </span>
+              MIT · open source · bring your own Claude / GPT key
             </div>
           </Reveal>
         </Container>
@@ -994,11 +924,8 @@ export default function LandingPage() {
           <div className="grid grid-cols-2 gap-10 md:grid-cols-4">
             <div>
               <Logo size={26} />
-              <p className="mt-4 max-w-xs text-[13px] leading-relaxed text-[var(--fg-muted)]">
-                Once designed. Consistent UI everywhere.
-                <br />
-                AI design tool for interactive multi-page UI. The Design System
-                comes with it.
+              <p className="mt-4 max-w-xs text-[12.5px] leading-relaxed text-[var(--fg-dim)]">
+                AI design method for multi-page UIs. DS included.
               </p>
             </div>
             {FOOTER_COLS.map((col) => (
@@ -1007,22 +934,28 @@ export default function LandingPage() {
                   {col.title}
                 </div>
                 <ul className="space-y-2 text-[13px]">
-                  {col.links.map((l) => (
-                    <li key={l.label}>
-                      <Link
-                        href={l.href}
-                        className="link-sweep text-[var(--fg-muted)] transition-colors hover:text-[var(--foreground)]"
-                      >
-                        {l.label}
-                      </Link>
-                    </li>
-                  ))}
+                  {col.links.map((l) => {
+                    const external = /^https?:\/\//.test(l.href)
+                    return (
+                      <li key={l.label}>
+                        <Link
+                          href={l.href}
+                          {...(external
+                            ? { target: '_blank', rel: 'noopener noreferrer' }
+                            : {})}
+                          className="link-sweep text-[var(--fg-muted)] transition-colors hover:text-[var(--foreground)]"
+                        >
+                          {l.label}
+                        </Link>
+                      </li>
+                    )
+                  })}
                 </ul>
               </div>
             ))}
           </div>
           <div className="mono mt-10 flex flex-col items-start justify-between gap-3 border-t border-[var(--border)] pt-6 text-[11.5px] text-[var(--fg-dim)] md:flex-row md:items-center">
-            <div>© 2026 Coherent Design Method · MIT · v0.7.24</div>
+            <div>© {currentYear} Coherent Design Method · MIT · v{cliVersion}</div>
             <div className="flex items-center gap-4">
               <span className="inline-flex items-center gap-1.5">
                 <span className="relative flex h-1.5 w-1.5">
@@ -1036,6 +969,457 @@ export default function LandingPage() {
         </Container>
       </footer>
     </>
+  )
+}
+
+function DSTokensPanel() {
+  const colors = [
+    { name: '--accent', hex: '#3ecf8e', role: 'accent' },
+    { name: '--background', hex: '#0a0a0a', role: 'background' },
+    { name: '--surface', hex: '#141414', role: 'surface' },
+    { name: '--foreground', hex: '#ededed', role: 'foreground' },
+  ]
+  const radii = [
+    { name: 'sm', px: 2 },
+    { name: 'md', px: 6 },
+    { name: 'lg', px: 10 },
+    { name: 'xl', px: 14 },
+  ]
+  const spacing = [4, 8, 12, 16, 24, 32]
+
+  return (
+    <div className="overflow-hidden rounded-xl border border-[var(--border-strong)] bg-[var(--surface)] shadow-[0_24px_60px_-30px_rgba(0,0,0,0.4)]">
+      {/* header */}
+      <div className="flex items-center justify-between border-b border-[var(--border)] bg-[var(--surface-2)] px-4 py-2">
+        <div className="flex items-center gap-2">
+          <span className="relative flex h-1.5 w-1.5">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[var(--accent)] opacity-50" />
+            <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[var(--accent)]" />
+          </span>
+          <span className="mono text-[11px] font-medium text-[var(--foreground)]">
+            design-system.config.ts
+          </span>
+        </div>
+        <span className="mono text-[9.5px] uppercase tracking-[0.14em] text-[var(--accent)]">
+          auto-generated
+        </span>
+      </div>
+
+      <div className="grid gap-3 p-3.5 md:grid-cols-2">
+        {/* COLOR */}
+        <section>
+          <DSLabel>color · 4 tokens</DSLabel>
+          <div className="mt-1.5 grid grid-cols-4 gap-1.5">
+            {colors.map((c) => (
+              <div key={c.name} className="flex flex-col gap-0.5">
+                <div
+                  className="h-8 rounded border border-[var(--border)]"
+                  style={{ background: c.hex }}
+                />
+                <span className="mono truncate text-[9px] text-[var(--fg-dim)]">
+                  {c.hex}
+                </span>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* TYPOGRAPHY */}
+        <section>
+          <DSLabel>typography · 2</DSLabel>
+          <div className="mt-1.5 grid grid-cols-2 gap-1.5">
+            <div className="flex items-center justify-between gap-2 rounded border border-[var(--border)] bg-[var(--elevated)] px-2.5 py-1.5">
+              <span
+                className="text-[var(--foreground)]"
+                style={{ fontSize: '18px', fontWeight: 600, letterSpacing: '-0.02em', lineHeight: 1 }}
+              >
+                Aa
+              </span>
+              <span className="mono text-[9px] text-[var(--fg-dim)]">Geist Sans</span>
+            </div>
+            <div className="flex items-center justify-between gap-2 rounded border border-[var(--border)] bg-[var(--elevated)] px-2.5 py-1.5">
+              <span
+                className="mono text-[var(--foreground)]"
+                style={{ fontSize: '18px', fontWeight: 500, lineHeight: 1 }}
+              >
+                aa
+              </span>
+              <span className="mono text-[9px] text-[var(--fg-dim)]">Geist Mono</span>
+            </div>
+          </div>
+        </section>
+
+        {/* RADIUS */}
+        <section>
+          <DSLabel>radius · 4</DSLabel>
+          <div className="mt-1.5 grid grid-cols-4 gap-1.5">
+            {radii.map((r) => (
+              <div key={r.name} className="flex flex-col items-center gap-0.5">
+                <div
+                  className="h-7 w-full border border-[var(--border-strong)] bg-[var(--elevated)]"
+                  style={{ borderRadius: `${r.px}px` }}
+                />
+                <span className="mono text-[9px] text-[var(--fg-dim)]">
+                  <span className="text-[var(--accent)]">{r.name}</span> {r.px}
+                </span>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* SPACING */}
+        <section>
+          <DSLabel>spacing · 4pt</DSLabel>
+          <div className="mt-1.5 flex h-[54px] items-end justify-between gap-1 rounded border border-[var(--border)] bg-[var(--elevated)] px-3 pb-1.5 pt-2">
+            {spacing.map((v) => (
+              <div key={v} className="flex flex-col items-center gap-1">
+                <div
+                  className="w-[8px] rounded-[1.5px] bg-gradient-to-t from-[var(--accent)]/40 to-[var(--accent)]"
+                  style={{ height: `${v}px` }}
+                />
+                <span className="mono text-[8.5px] tabular-nums text-[var(--fg-dim)]">
+                  {v}
+                </span>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* COMPONENTS — full width, 2 rows */}
+        <section className="md:col-span-2">
+          <DSLabel>components · live · 9 registered</DSLabel>
+          <div className="mt-1.5 flex flex-col gap-1.5 rounded border border-[var(--border)] bg-[var(--elevated)] px-2.5 py-2">
+            {/* row 1 — buttons + badges */}
+            <div className="flex flex-wrap items-center gap-1.5">
+              <button className="mono inline-flex h-6 items-center rounded bg-[var(--accent)] px-2 text-[10.5px] font-medium text-[var(--accent-foreground)]">
+                Primary
+              </button>
+              <button className="mono inline-flex h-6 items-center rounded border border-[var(--border-strong)] bg-[var(--surface)] px-2 text-[10.5px] text-[var(--foreground)]">
+                Secondary
+              </button>
+              <span className="mono inline-flex h-5 items-center rounded-[2px] border border-[var(--accent)]/35 bg-[var(--accent)]/12 px-1.5 text-[9px] uppercase tracking-[0.1em] text-[var(--accent)]">
+                success
+              </span>
+              <span className="mono inline-flex h-5 items-center rounded-[2px] border border-[var(--error)]/35 bg-[var(--error)]/12 px-1.5 text-[9px] uppercase tracking-[0.1em] text-[var(--error)]">
+                error
+              </span>
+              <span className="mono ml-auto text-[9.5px] text-[var(--accent)]">
+                CID-001…005
+              </span>
+            </div>
+            {/* row 2 — toggle + checkbox + radio */}
+            <div className="flex flex-wrap items-center gap-3 border-t border-[var(--border)] pt-2">
+              {/* toggle (on) */}
+              <span className="inline-flex items-center gap-1.5">
+                <span className="relative inline-flex h-[14px] w-[24px] items-center rounded-full bg-[var(--accent)] px-[2px]">
+                  <span className="h-[10px] w-[10px] translate-x-[10px] rounded-full bg-white shadow-[0_1px_2px_rgba(0,0,0,0.3)]" />
+                </span>
+                <span className="mono text-[9.5px] text-[var(--fg-muted)]">toggle</span>
+              </span>
+              {/* checkbox (checked) */}
+              <span className="inline-flex items-center gap-1.5">
+                <span className="inline-flex h-[14px] w-[14px] items-center justify-center rounded-[3px] bg-[var(--accent)] text-[var(--accent-foreground)]">
+                  <svg width="9" height="9" viewBox="0 0 12 12" fill="none" aria-hidden>
+                    <path d="M2.5 6.5L5 9l4.5-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </span>
+                <span className="mono text-[9.5px] text-[var(--fg-muted)]">checkbox</span>
+              </span>
+              {/* radio (selected) */}
+              <span className="inline-flex items-center gap-1.5">
+                <span className="inline-flex h-[14px] w-[14px] items-center justify-center rounded-full border border-[var(--accent)]">
+                  <span className="h-[7px] w-[7px] rounded-full bg-[var(--accent)]" />
+                </span>
+                <span className="mono text-[9.5px] text-[var(--fg-muted)]">radio</span>
+              </span>
+              {/* slider */}
+              <span className="inline-flex items-center gap-1.5">
+                <span className="relative inline-flex h-[4px] w-[40px] items-center rounded-full bg-[var(--border-strong)]">
+                  <span className="absolute left-0 h-full w-[60%] rounded-full bg-[var(--accent)]" />
+                  <span className="absolute left-[60%] top-1/2 h-[10px] w-[10px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-[var(--accent)] bg-[var(--surface)]" />
+                </span>
+                <span className="mono text-[9.5px] text-[var(--fg-muted)]">slider</span>
+              </span>
+              <span className="mono ml-auto text-[9.5px] text-[var(--accent)]">
+                CID-006…009
+              </span>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      {/* footer */}
+      <div className="mono flex items-center justify-between border-t border-[var(--border)] bg-[var(--surface-2)] px-4 py-2 text-[9.5px] text-[var(--fg-dim)]">
+        <span>12 tokens · 9 components · 5 pages</span>
+        <span className="inline-flex items-center gap-1 text-[var(--accent)]">
+          <span className="h-1 w-1 rounded-full bg-[var(--accent)]" />
+          every value editable
+        </span>
+      </div>
+    </div>
+  )
+}
+
+function DSLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="mono flex items-center gap-1.5 text-[9px] uppercase tracking-[0.14em] text-[var(--fg-dim)]">
+      <span className="inline-block h-1 w-1 rounded-full bg-[var(--accent)]" />
+      {children}
+    </div>
+  )
+}
+
+function AtmospherePreview({ name }: { name: string }) {
+  if (name === 'Console') {
+    return (
+      <div
+        className="flex h-36 flex-col justify-between overflow-hidden rounded-md border border-[var(--border)] p-3"
+        style={{
+          background: '#0a0a0a',
+          fontFamily: 'var(--font-geist-mono, ui-monospace, monospace)',
+        }}
+      >
+        <div className="flex items-center justify-between text-[9px] uppercase tracking-[0.14em]" style={{ color: '#6b7a6f' }}>
+          <span className="inline-flex items-center gap-1.5">
+            <span className="h-1 w-1 rounded-full" style={{ background: '#3ecf8e' }} />
+            traces · prod
+          </span>
+          <span>live</span>
+        </div>
+        <div>
+          <div className="text-[9px] uppercase tracking-[0.14em]" style={{ color: '#6b7a6f' }}>
+            p99 latency
+          </div>
+          <div className="mt-0.5 flex items-baseline gap-1.5">
+            <span className="text-[22px] font-medium leading-none tabular-nums" style={{ color: '#ededed' }}>
+              124
+            </span>
+            <span className="text-[10px]" style={{ color: '#6b7a6f' }}>
+              ms
+            </span>
+            <span className="text-[10px] tabular-nums" style={{ color: '#3ecf8e' }}>
+              −8ms
+            </span>
+          </div>
+          <div className="mt-1.5 flex h-4 items-end gap-[1.5px]">
+            {[6, 8, 5, 10, 7, 9, 12, 8, 11, 14, 10, 13, 9, 11, 8].map((h, i) => (
+              <span
+                key={i}
+                className="flex-1 rounded-[1px]"
+                style={{ height: `${h}px`, background: '#3ecf8e', opacity: 0.6 + (i % 3) * 0.12 }}
+              />
+            ))}
+          </div>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <span
+            className="inline-flex h-5 items-center rounded-[3px] px-2 text-[10px] font-medium"
+            style={{ background: '#3ecf8e', color: '#0a0a0a' }}
+          >
+            Save query
+          </span>
+          <span
+            className="inline-flex h-5 items-center rounded-[3px] border px-2 text-[10px]"
+            style={{ borderColor: '#2a2a2a', color: '#a0a0a0' }}
+          >
+            cancel
+          </span>
+        </div>
+      </div>
+    )
+  }
+
+  if (name === 'Warm') {
+    return (
+      <div
+        className="flex h-36 flex-col justify-between overflow-hidden rounded-[14px] border p-3.5"
+        style={{
+          background: '#fdfaf4',
+          borderColor: 'rgba(139,58,43,0.12)',
+          fontFamily: 'var(--font-geist-sans, ui-sans-serif, system-ui)',
+          boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.6)',
+        }}
+      >
+        <div className="flex items-center gap-1.5">
+          <span className="inline-flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-semibold" style={{ background: 'rgba(200,90,70,0.14)', color: '#c85a46' }}>
+            S
+          </span>
+          <span className="text-[10px]" style={{ color: 'rgba(60,45,35,0.55)' }}>
+            Good morning, Sergei
+          </span>
+        </div>
+        <div>
+          <div className="text-[17px] font-semibold leading-[1.2] tracking-tight" style={{ color: '#2b1e14' }}>
+            Ready when you are.
+          </div>
+          <div className="mt-1 text-[11px] leading-[1.45]" style={{ color: 'rgba(60,45,35,0.65)' }}>
+            3 drafts · 1 scheduled for tomorrow.
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <span
+            className="inline-flex h-7 items-center rounded-full px-3 text-[11px] font-medium"
+            style={{ background: '#c85a46', color: '#fdfaf4' }}
+          >
+            Continue →
+          </span>
+          <span
+            className="inline-flex h-7 items-center rounded-full border px-3 text-[11px]"
+            style={{ borderColor: 'rgba(139,58,43,0.2)', color: '#8a5340' }}
+          >
+            Later
+          </span>
+        </div>
+      </div>
+    )
+  }
+
+  if (name === 'Minimal') {
+    return (
+      <div
+        className="flex h-36 flex-col justify-between overflow-hidden rounded-md border p-3.5"
+        style={{
+          background: '#fafafa',
+          borderColor: 'rgba(0,0,0,0.08)',
+          fontFamily: 'var(--font-geist-sans, ui-sans-serif, system-ui)',
+        }}
+      >
+        <div
+          className="flex items-center justify-between text-[9px] uppercase tracking-[0.16em]"
+          style={{ color: 'rgba(0,0,0,0.45)' }}
+        >
+          <span>acme · overview</span>
+          <span>v2.1</span>
+        </div>
+        <div className="grid grid-cols-3 gap-2">
+          {[
+            { l: 'MRR', v: '$42.1k', d: '+12%' },
+            { l: 'Users', v: '3,204', d: '+8%' },
+            { l: 'Churn', v: '2.1%', d: '−0.4' },
+          ].map((s) => (
+            <div key={s.l} className="flex flex-col gap-0.5">
+              <span className="text-[8.5px] uppercase tracking-[0.12em]" style={{ color: 'rgba(0,0,0,0.5)' }}>
+                {s.l}
+              </span>
+              <span className="text-[13px] font-semibold leading-none tabular-nums" style={{ color: '#111' }}>
+                {s.v}
+              </span>
+              <span className="text-[9px] tabular-nums" style={{ color: 'rgba(0,0,0,0.45)' }}>
+                {s.d}
+              </span>
+            </div>
+          ))}
+        </div>
+        <div className="flex items-center gap-1.5">
+          <span
+            className="inline-flex h-6 items-center rounded-[5px] px-2.5 text-[10.5px] font-medium"
+            style={{ background: '#111', color: '#fafafa' }}
+          >
+            View report
+          </span>
+          <span
+            className="inline-flex h-6 items-center rounded-[5px] border px-2.5 text-[10.5px]"
+            style={{ borderColor: 'rgba(0,0,0,0.12)', color: 'rgba(0,0,0,0.7)' }}
+          >
+            Export
+          </span>
+        </div>
+      </div>
+    )
+  }
+
+  if (name === 'Bold') {
+    return (
+      <div
+        className="flex h-36 flex-col justify-between overflow-hidden border p-3.5"
+        style={{
+          background: '#000000',
+          borderColor: '#ffffff',
+          fontFamily: 'var(--font-geist-sans, ui-sans-serif, system-ui)',
+        }}
+      >
+        <div className="flex items-center justify-between">
+          <span
+            className="inline-flex h-5 items-center px-1.5 text-[9px] font-bold uppercase tracking-[0.14em]"
+            style={{ background: '#ff3d00', color: '#000' }}
+          >
+            new
+          </span>
+          <span className="text-[9px] font-bold uppercase tracking-[0.2em]" style={{ color: '#fff' }}>
+            2026 / drop 04
+          </span>
+        </div>
+        <div
+          className="text-[26px] font-black leading-[0.92] tracking-[-0.03em]"
+          style={{ color: '#fff' }}
+        >
+          MAKE IT
+          <br />
+          <span style={{ color: '#ff3d00' }}>LOUD.</span>
+        </div>
+        <div className="flex items-stretch gap-0">
+          <span
+            className="inline-flex h-7 flex-1 items-center justify-center text-[10.5px] font-bold uppercase tracking-[0.14em]"
+            style={{ background: '#fff', color: '#000' }}
+          >
+            Get it →
+          </span>
+          <span
+            className="inline-flex h-7 items-center justify-center border px-3 text-[10.5px] font-bold uppercase tracking-[0.14em]"
+            style={{ borderColor: '#fff', color: '#fff' }}
+          >
+            Info
+          </span>
+        </div>
+      </div>
+    )
+  }
+
+  // Editorial
+  return (
+    <div
+      className="flex h-36 flex-col justify-between overflow-hidden rounded-[2px] border p-3.5"
+      style={{
+        background: '#fdfbf7',
+        borderColor: 'rgba(40,25,15,0.15)',
+        fontFamily: 'Georgia, "Times New Roman", serif',
+      }}
+    >
+      <div
+        className="text-[9px] uppercase tracking-[0.2em]"
+        style={{ color: 'rgba(40,25,15,0.55)', fontFamily: 'ui-monospace, monospace' }}
+      >
+        № 12 · essay
+      </div>
+      <div>
+        <div
+          className="text-[18px] font-semibold leading-[1.15]"
+          style={{ color: '#1a120a', letterSpacing: '-0.01em' }}
+        >
+          On the art of naming.
+        </div>
+        <div
+          className="mt-1.5 max-w-[22ch] text-[11px] italic leading-[1.45]"
+          style={{ color: 'rgba(40,25,15,0.65)' }}
+        >
+          Naming is invention. It is also constraint.
+        </div>
+      </div>
+      <div className="flex items-center justify-between">
+        <span
+          className="text-[10px]"
+          style={{ color: 'rgba(40,25,15,0.55)', fontFamily: 'ui-monospace, monospace' }}
+        >
+          by Sergei K.
+        </span>
+        <span
+          className="text-[11px] font-medium underline decoration-[1px] underline-offset-[3px]"
+          style={{ color: '#8b3a2b' }}
+        >
+          Read →
+        </span>
+      </div>
+    </div>
   )
 }
 
@@ -1061,109 +1445,98 @@ const ATMOSPHERES = [
     preview:
       'radial-gradient(60% 50% at 50% 0%, rgba(139,58,43,0.14), transparent 60%), radial-gradient(40% 30% at 80% 50%, rgba(139,58,43,0.08), transparent 70%), #fdfbf7',
   },
-]
-
-const STATS: {
-  label: string
-  value: number
-  suffix: string
-  format: 'commas' | 'int' | 'decimal2'
-  note: string
-}[] = [
   {
-    label: 'enforced rules',
-    value: 23,
-    suffix: '',
-    format: 'int',
-    note: 'F11 + F12 landed v0.7.24',
+    name: 'Minimal',
+    mood: 'Monochrome. Clean sans. No accent flair. Grid-driven. For pro-neutral products where the product is the story, not the decor.',
+    fit: 'Vercel, Linear, Raycast, Plausible',
+    preview: '#fafafa',
   },
   {
-    label: 'tests passing',
-    value: 1068,
-    suffix: '',
-    format: 'commas',
-    note: 'green every ship',
-  },
-  {
-    label: 'wiki entries indexed',
-    value: 64,
-    suffix: '',
-    format: 'int',
-    note: 'retrieval precision@1 100%',
-  },
-  {
-    label: 'version',
-    value: 724,
-    suffix: '',
-    format: 'int',
-    note: 'v0.7.24 · MIT',
+    name: 'Bold',
+    mood: 'Raw contrast. Huge type. Hard edges. Black-and-white with one loud color. For statement brands that want to be remembered.',
+    fit: 'Awwwards portfolios, Gumroad, Pitch, Figma community',
+    preview: '#000000',
   },
 ]
 
-const WORKFLOW = [
+const HOW_STEPS = [
   {
-    step: '1',
-    cmd: 'coherent init',
-    body: 'pick atmosphere + scaffold Next.js project with design-system.config.ts',
+    step: '01',
+    label: 'Scaffold the project',
+    cmd: 'coherent init my-app && cd my-app',
+    body: '30 seconds: a Next.js project with a design-system.config.ts, component folder, and docs — ready to customize.',
   },
   {
-    step: '2',
-    cmd: 'coherent chat',
-    body: 'describe what you want — plan, generate, validate, auto-fix',
+    step: '02',
+    label: 'Describe what you need',
+    cmd: 'coherent chat "add a dashboard with revenue stats and user growth chart"',
+    body: 'Coherent generates a complete dashboard. Real components. Real data. Not a wireframe.',
   },
   {
-    step: '3',
-    cmd: 'coherent check',
-    body: 'cross-page consistency, a11y, anti-patterns, empty-states',
+    step: '03',
+    label: 'Add more pages',
+    cmd: 'coherent chat "add a settings page and pricing page with three tiers"',
+    body: 'Every new page automatically reuses the same Header, Footer, and design tokens from the dashboard. No copy-paste. No drift.',
   },
   {
-    step: '4',
-    cmd: 'coherent wiki reflect',
-    body: 'platform memory loop — decisions, patterns, rules persist across sessions',
+    step: '04',
+    label: 'Preview and iterate',
+    cmd: 'coherent preview',
+    body: 'Hot reload. Open the project in Cursor or Claude Code and describe changes in chat — edits cascade through the DS.',
   },
   {
-    step: '5',
-    cmd: 'next dev',
-    body: 'standard Next.js. standard Tailwind. standard shadcn/ui. Your code.',
+    step: '05',
+    label: 'Ship it',
+    cmd: 'coherent export --output ./my-app',
+    body: 'Clean Next.js project. No platform code. Deploy to Vercel in one click, or hand off to your team.',
   },
 ]
+
 
 const FAQ = [
   {
-    q: 'Do I need to know code?',
-    a: 'No. You describe what you want in plain English — pages, atmosphere, tweaks — and Coherent writes the code. Everything you get (components, tokens, pages) is editable by describing the change you want. That said, the output is standard code, so if you or your dev wants to open a file and edit it directly, everything is transparent and readable. English-first, code-always-available.',
+    q: 'What is Coherent Design Method?',
+    a: 'A CLI that generates multi-page UI prototypes where every page shares the same components, colors, and layout. Unlike single-page generators, Coherent builds a Design System as you go — component library, tokens, docs — so the UI stays consistent across your whole app. Change one thing, everywhere it updates.',
   },
   {
-    q: 'Is it a replacement for Figma?',
-    a: 'Not exactly. Figma is a design tool; Coherent is a design-to-UI tool. If you design systems and mockups, Figma still wins. If you need a clickable multi-page demo that behaves like real software — nav works, states toggle, forms accept input, animations land — Coherent gives you that. Many designers use both: Figma for exploration, Coherent for the interactive version they ship.',
+    q: 'Who is it for?',
+    a: 'Founders building multi-page prototypes, designers who ship code, product teams that need clickable demos that behave like real software, and devs who want a clean Next.js starting point with a Design System already in place. If your work is one-off single pages, v0/Lovable cover you. If you need interconnected pages plus a DS that grows, that\'s Coherent.',
   },
   {
-    q: 'What is an atmosphere and do I have to use one?',
-    a: 'Atmospheres are starter kits — a complete visual vocabulary (typography, color, spacing, motion, layout, mood) bundled together so you don\'t start from a blank canvas. You can pick Console, Warm, Editorial — or skip them entirely and define your own design-system.config.ts. Atmospheres are convenience, never a ceiling. Your own fonts, your own palette, your own rhythm — all supported from day one.',
-  },
-  {
-    q: 'Can I edit a single component across every page?',
-    a: 'Yes — this is the core differentiator. Every shared component has a stable ID (CID-XXX). Edit it once, every page that uses it updates automatically. Same for tokens: change --accent from emerald to coral, every button, card, and link using the accent follows. The cascade is not magic — it\'s how React imports work — but Coherent\'s component registry makes the "where is this used" question explicit.',
-  },
-  {
-    q: 'What about my brand — my fonts, colors, spacing?',
-    a: 'Full control. design-system.config.ts is a plain file you can edit: typography pair, color palette, radius scale, spacing base, motion easing — all yours to change. Coherent uses whatever you set. If you have a Figma team library, feed Coherent your tokens and it generates against them. If you have a Brand Book PDF, describe the rules in plain English and Coherent translates.',
-  },
-  {
-    q: 'What does the output actually look like? What do I ship?',
-    a: 'A clean Next.js 15 project with Tailwind CSS and shadcn/ui components. Standard React, standard TypeScript, no Coherent runtime dependency. You can: (1) show it to stakeholders as a clickable demo, (2) hand it to a developer for backend integration, or (3) plug a backend in yourself and ship it as real production frontend. Deploy to Vercel, Netlify, Fly, Cloudflare, or self-host. Your code, your choice.',
+    q: 'Do I need to know how to code?',
+    a: 'No. You describe what you want in plain English — pages, atmosphere, tweaks — and Coherent writes the code. Everything (components, tokens, pages) is editable by describing the change you want. The output is standard code, so if you or your dev wants to open a file directly, everything is transparent and readable. English-first, code-always-available.',
   },
   {
     q: 'How is this different from v0, Lovable, or Bolt?',
     a: 'Those tools nail a single page. Ask for a second page and you get a different header, different buttons, different spacing. Coherent targets the step after: multi-page consistency plus a Design System that grows alongside. You still use v0 or Lovable for quick single-page explorations. You use Coherent when you need a coherent multi-page product (and a DS you own).',
   },
   {
-    q: 'What LLM does it use? How much does it cost?',
+    q: 'Can I use it with Cursor, Claude Code, or other AI editors?',
+    a: 'Yes. Coherent provides context to any AI editor via .cursorrules and CLAUDE.md files. Your AI editor knows about every shared component, every design token, and every quality rule. Start in the terminal with `coherent chat`, continue in Cursor with natural language, switch back for a validation run — same project, shared foundation.',
+  },
+  {
+    q: 'What do I get after export?',
+    a: 'A clean Next.js 15 project with Tailwind CSS and shadcn/ui. Standard React, standard TypeScript, no Coherent runtime dependency. Use it as (1) a clickable stakeholder demo, (2) a handoff artifact for a developer, or (3) production frontend with your own backend wired in. Deploy to Vercel, Netlify, Fly, Cloudflare, or self-host. Your code, your choice.',
+  },
+  {
+    q: 'What AI model does it use?',
     a: 'Works with Anthropic Claude (recommended — best results, especially with prompt caching) or OpenAI GPT-4. You bring your own API key — prompted once at setup. Typical cost: $0.01–0.03 per page. A 5-page app scaffold costs roughly $0.10. No subscription, no middleman, no platform fee.',
   },
   {
+    q: 'Is it free?',
+    a: 'Yes. MIT licensed. Everything — CLI, all atmospheres, all validators, all features — is in the open source tier. No gated features, no usage limits. You bring your own LLM key. Sponsoring is optional — it funds faster atmosphere engine development.',
+  },
+  {
+    q: 'What is an atmosphere?',
+    a: 'Atmospheres are starter kits — a complete visual vocabulary (typography, color, spacing, motion, layout, mood) bundled together so you don\'t start from a blank canvas. Pick Console, Warm, Editorial — or skip them entirely and define your own design-system.config.ts. Atmospheres are convenience, never a ceiling.',
+  },
+  {
     q: 'Is it production-ready?',
-    a: 'v0.7.24 today is stable for prototypes, internal tools, stakeholder demos, and dev handoff. 1,068 tests passing, 23 design principles enforced, MIT licensed. For bet-the-company public product UI, treat the output as a strong starting point and do a human polish pass. For fast internal dashboards and handoffs, ship today.',
+    a: 'v0.7.27 today is stable for prototypes, internal tools, stakeholder demos, and dev handoff. 1,068 tests passing, 23 design principles enforced, MIT licensed. For bet-the-company public product UI, treat the output as a strong starting point and do a human polish pass. For fast internal dashboards and handoffs, ship today.',
+  },
+  {
+    q: 'Where do I get help?',
+    a: 'GitHub issues for bugs and feature requests — response usually within 24h. GitHub Discussions for questions. The full RULES_MAP and IDEAS_BACKLOG are open on the repo — you can see exactly what\'s shipped, what\'s planned, and why.',
   },
 ]
 
@@ -1171,37 +1544,36 @@ const PRICING = [
   {
     name: 'Open source',
     price: '$0',
-    period: '/ MIT',
+    period: '· MIT · forever',
     tagline:
-      'Full CLI, all atmospheres, all validators. No gated features. You bring your LLM key.',
+      'Everything. No paid tier, no gated features, no usage limits. You bring your own LLM key.',
     features: [
       'Unlimited projects',
-      'All 3 flagship atmospheres',
+      'All 5 atmospheres (Console, Warm, Editorial, Minimal, Bold + your own)',
       '23 enforced rules + auto-fix',
       'Shared components registry',
       'Wiki memory loop',
-      'Bring your own Claude / GPT key',
+      'Works with Cursor, Claude Code, any AI editor',
     ],
     cta: 'Install now',
-    href: '#install',
+    href: '#start',
     featured: false,
   },
   {
     name: 'Sponsor',
-    price: '$—',
+    price: 'Optional',
     period: '· your call',
     tagline:
-      'Fund the atmosphere engine. Get your logo on the landing, priority on atmosphere requests, name in commit log.',
+      'Support the project. Faster atmosphere engine shipping, priority on requests, your logo on the site.',
     features: [
-      'Everything in OSS',
+      'Everything in Open source',
       'Priority atmosphere requests',
       'Logo on getcoherent.design',
       'Direct line to the maintainer',
-      'Early access to 4th atmosphere',
       'GitHub Sponsors + OpenCollective',
     ],
     cta: 'Sponsor on GitHub',
-    href: 'https://github.com/skovtun/coherent-design-method',
+    href: 'https://github.com/sponsors/skovtun',
     featured: true,
   },
 ]
@@ -1210,26 +1582,25 @@ const FOOTER_COLS = [
   {
     title: 'Product',
     links: [
+      { label: 'How it works', href: '#how' },
+      { label: 'Design System', href: '#design-system' },
       { label: 'Atmospheres', href: '#atmospheres' },
-      { label: 'Features', href: '#features' },
-      { label: 'Pricing', href: '#pricing' },
-      { label: 'Changelog', href: 'https://github.com/skovtun/coherent-design-method/blob/main/docs/CHANGELOG.md' },
     ],
   },
   {
     title: 'Docs',
     links: [
-      { label: 'Quickstart', href: 'https://github.com/skovtun/coherent-design-method#quickstart' },
-      { label: 'Design system', href: '/design-system' },
-      { label: 'GitHub', href: 'https://github.com/skovtun/coherent-design-method' },
+      { label: 'Quickstart', href: '#start' },
+      { label: 'Changelog', href: 'https://github.com/skovtun/coherent-design-method/blob/main/docs/CHANGELOG.md' },
+      { label: 'FAQ', href: '#faq' },
     ],
   },
   {
     title: 'Project',
     links: [
+      { label: 'GitHub', href: 'https://github.com/skovtun/coherent-design-method' },
       { label: 'RULES_MAP', href: 'https://github.com/skovtun/coherent-design-method/blob/main/docs/wiki/RULES_MAP.md' },
-      { label: 'IDEAS_BACKLOG', href: 'https://github.com/skovtun/coherent-design-method/blob/main/docs/wiki/IDEAS_BACKLOG.md' },
-      { label: 'ADRs', href: 'https://github.com/skovtun/coherent-design-method/tree/main/docs/wiki/ADR' },
+      { label: 'Sponsor', href: '#sponsor' },
     ],
   },
 ]

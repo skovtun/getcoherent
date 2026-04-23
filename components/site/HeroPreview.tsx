@@ -1,6 +1,6 @@
 'use client'
 
-import { motion, useReducedMotion, AnimatePresence } from 'framer-motion'
+import { motion, useReducedMotion } from 'framer-motion'
 import { Pause, Play } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { DesignSystemCard } from './DesignSystemCard'
@@ -121,17 +121,27 @@ export function HeroPreview() {
             }}
           />
         </svg>
-        <AnimatePresence mode="wait" initial={false}>
-          <motion.div
-            key={current.id}
-            initial={reduce ? false : { opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={reduce ? undefined : { opacity: 0, y: -12 }}
-            transition={{ duration: 0.4, ease: [0.25, 1, 0.5, 1] }}
-          >
-            {current.id === 'ui' ? <GeneratedUISlide /> : <DesignSystemSlide />}
-          </motion.div>
-        </AnimatePresence>
+        <div className="grid min-h-[620px] grid-cols-1 grid-rows-1">
+          {SLIDES.map((s) => {
+            const active = s.id === current.id
+            return (
+              <motion.div
+                key={s.id}
+                className="col-start-1 row-start-1 h-full"
+                animate={
+                  reduce
+                    ? { opacity: active ? 1 : 0 }
+                    : { opacity: active ? 1 : 0, y: active ? 0 : -8 }
+                }
+                transition={{ duration: 0.4, ease: [0.25, 1, 0.5, 1] }}
+                style={{ pointerEvents: active ? 'auto' : 'none' }}
+                aria-hidden={!active}
+              >
+                {s.id === 'ui' ? <GeneratedUISlide /> : <DesignSystemSlide />}
+              </motion.div>
+            )
+          })}
+        </div>
       </div>
 
       {/* CAPTION */}
@@ -190,7 +200,7 @@ export function HeroPreview() {
 
 function GeneratedUISlide() {
   return (
-    <div className="overflow-hidden rounded-xl border border-[var(--border-strong)] bg-[var(--surface)] shadow-[0_24px_60px_-30px_rgba(0,0,0,0.4)]">
+    <div className="flex h-full flex-col overflow-hidden rounded-xl border border-[var(--border-strong)] bg-[var(--surface)] shadow-[0_24px_60px_-30px_rgba(0,0,0,0.4)]">
       <div className="flex items-center justify-between border-b border-[var(--border)] bg-[var(--surface-2)] px-4 py-2.5">
         <div className="flex items-center gap-1.5">
           <span className="h-2.5 w-2.5 rounded-full bg-[var(--border-strong)]" />
@@ -203,7 +213,7 @@ function GeneratedUISlide() {
         </div>
         <span className="mono text-[11px] text-[var(--fg-dim)]">live</span>
       </div>
-      <div className="relative w-full bg-[var(--background)]">
+      <div className="relative flex min-h-0 w-full flex-1 bg-[var(--background)]">
         <TraceConsole />
       </div>
       <div className="mono flex items-center justify-between border-t border-[var(--border)] bg-[var(--surface-2)] px-4 py-2.5 text-[11px] text-[var(--fg-dim)]">

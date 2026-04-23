@@ -2,10 +2,24 @@
 
 import { ArrowRight, Check, Search } from 'lucide-react'
 
+const CID_REGISTRY = [
+  { cid: 'CID-0012', name: 'Button', used: 47 },
+  { cid: 'CID-0018', name: 'Input', used: 23 },
+  { cid: 'CID-0021', name: 'Badge', used: 34 },
+  { cid: 'CID-0027', name: 'Card', used: 19 },
+]
+
+const PAGES_MANIFEST = [
+  { route: '/', file: 'app/page.tsx', cids: 7 },
+  { route: '/pricing', file: 'app/pricing/page.tsx', cids: 5 },
+  { route: '/dashboard', file: 'app/dashboard/page.tsx', cids: 8 },
+  { route: '/settings', file: 'app/settings/page.tsx', cids: 6 },
+]
+
 export function DesignSystemCard() {
   return (
     <div
-      className="overflow-hidden rounded-xl border border-[var(--border-strong)] bg-[var(--surface)] shadow-[0_24px_60px_-30px_rgba(0,0,0,0.4)]"
+      className="flex h-full flex-col overflow-hidden rounded-xl border border-[var(--border-strong)] bg-[var(--surface)] shadow-[0_24px_60px_-30px_rgba(0,0,0,0.4)]"
     >
       {/* frame header */}
       <div className="flex items-center justify-between border-b border-[var(--border)] bg-[var(--surface-2)] px-4 py-2.5">
@@ -25,7 +39,7 @@ export function DesignSystemCard() {
       </div>
 
       {/* body */}
-      <div className="flex flex-col gap-5 p-5">
+      <div className="flex flex-1 flex-col gap-5 p-5">
       <div className="grid gap-5 lg:grid-cols-[1.1fr_1fr]">
         {/* LEFT COLUMN — TOKENS */}
         <div className="space-y-5">
@@ -214,6 +228,64 @@ export function DesignSystemCard() {
           </pre>
         </div>
       </section>
+
+      {/* REGISTRY + PAGES · full-width bottom */}
+      <section className="grid gap-5 lg:grid-cols-2">
+        <div>
+          <SectionLabel>registry · cid-addressed</SectionLabel>
+          <div className="mt-2 overflow-hidden rounded-md border border-[var(--border)] bg-[var(--elevated)]">
+            <div className="mono grid grid-cols-[1fr_1fr_auto] gap-3 border-b border-[var(--border)] px-3 py-1.5 text-[9px] uppercase tracking-[0.14em] text-[var(--fg-dim)]">
+              <span>id</span>
+              <span>component</span>
+              <span className="text-right">used in</span>
+            </div>
+            {CID_REGISTRY.map((c, i) => (
+              <div
+                key={c.cid}
+                className={`mono grid grid-cols-[1fr_1fr_auto] gap-3 px-3 py-1.5 text-[11px] ${
+                  i !== CID_REGISTRY.length - 1
+                    ? 'border-b border-[var(--border)]'
+                    : ''
+                }`}
+              >
+                <span className="text-[var(--accent)]">{c.cid}</span>
+                <span className="text-[var(--foreground)]">{c.name}</span>
+                <span className="text-right tabular-nums text-[var(--fg-dim)]">
+                  {c.used} pages
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <SectionLabel>pages · manifest</SectionLabel>
+          <div className="mt-2 overflow-hidden rounded-md border border-[var(--border)] bg-[var(--elevated)]">
+            <div className="mono grid grid-cols-[auto_1fr_auto] gap-3 border-b border-[var(--border)] px-3 py-1.5 text-[9px] uppercase tracking-[0.14em] text-[var(--fg-dim)]">
+              <span>route</span>
+              <span>file</span>
+              <span className="text-right">cids</span>
+            </div>
+            {PAGES_MANIFEST.map((p, i) => (
+              <div
+                key={p.route}
+                className={`mono grid grid-cols-[auto_1fr_auto] gap-3 px-3 py-1.5 text-[11px] ${
+                  i !== PAGES_MANIFEST.length - 1
+                    ? 'border-b border-[var(--border)]'
+                    : ''
+                }`}
+              >
+                <span className="text-[var(--accent)]">{p.route}</span>
+                <span className="truncate text-[var(--fg-muted)]">{p.file}</span>
+                <span className="text-right tabular-nums text-[var(--fg-dim)]">
+                  {p.cids}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       </div>
 
       {/* footer */}
@@ -272,7 +344,7 @@ function TypeRow({
   uppercase?: boolean
 }) {
   return (
-    <div className="grid grid-cols-[auto_1fr_auto] items-baseline gap-3">
+    <div className="grid grid-cols-[auto_1fr_auto] items-baseline gap-8">
       <span className="mono w-10 text-[9px] uppercase tracking-[0.16em] text-[var(--fg-dim)]">
         {label}
       </span>

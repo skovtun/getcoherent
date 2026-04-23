@@ -97,7 +97,7 @@ export function TraceConsole() {
   const chartH = 100
 
   return (
-    <div className="relative flex min-h-[620px] text-[var(--foreground)]">
+    <div className="relative flex h-full min-h-0 text-[var(--foreground)]">
       {/* SIDEBAR */}
       <aside className="hidden w-[220px] shrink-0 flex-col border-r border-[var(--border)] bg-[var(--surface)] px-3 py-4 md:flex">
         {/* product + org switch */}
