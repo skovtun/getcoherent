@@ -1052,14 +1052,13 @@ function DSTokensPanel() {
           <DSLabel>radius · 4</DSLabel>
           <div className="mt-1.5 grid grid-cols-4 gap-1.5">
             {radii.map((r) => (
-              <div key={r.name} className="flex flex-col items-center gap-0.5">
-                <div
-                  className="h-7 w-full border border-[var(--border-strong)] bg-[var(--elevated)]"
-                  style={{ borderRadius: `${r.px}px` }}
-                />
-                <span className="mono text-[9px] text-[var(--fg-dim)]">
-                  <span className="text-[var(--accent)]">{r.name}</span> {r.px}
-                </span>
+              <div
+                key={r.name}
+                className="mono flex h-9 items-center justify-center border border-[var(--border-strong)] bg-[var(--elevated)] text-[10px]"
+                style={{ borderRadius: `${r.px}px` }}
+              >
+                <span className="text-[var(--accent)]">{r.name}</span>
+                <span className="ml-1 text-[var(--fg-dim)]">{r.px}</span>
               </div>
             ))}
           </div>
@@ -1068,12 +1067,12 @@ function DSTokensPanel() {
         {/* SPACING */}
         <section>
           <DSLabel>spacing · 4pt</DSLabel>
-          <div className="mt-1.5 flex h-[54px] items-end justify-between gap-1 rounded border border-[var(--border)] bg-[var(--elevated)] px-3 pb-1.5 pt-2">
+          <div className="mt-1.5 flex h-[56px] items-end justify-between gap-1 rounded border border-[var(--border)] bg-[var(--elevated)] px-2.5 pb-1 pt-1.5">
             {spacing.map((v) => (
               <div key={v} className="flex flex-col items-center gap-1">
                 <div
-                  className="w-[8px] rounded-[1.5px] bg-gradient-to-t from-[var(--accent)]/40 to-[var(--accent)]"
-                  style={{ height: `${v}px` }}
+                  className="rounded-[1.5px] bg-gradient-to-t from-[var(--accent)]/50 to-[var(--accent)]"
+                  style={{ width: `${v}px`, height: `${v}px` }}
                 />
                 <span className="mono text-[8.5px] tabular-nums text-[var(--fg-dim)]">
                   {v}
