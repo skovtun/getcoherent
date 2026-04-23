@@ -18,30 +18,30 @@ export const config = {
   "tokens": {
     "colors": {
       "light": {
-        "primary": "#3B82F6",
-        "secondary": "#8B5CF6",
-        "accent": "#F59E0B",
-        "success": "#10B981",
-        "warning": "#F59E0B",
-        "error": "#EF4444",
-        "info": "#3B82F6",
-        "background": "#FFFFFF",
-        "foreground": "#111827",
-        "muted": "#F3F4F6",
-        "border": "#E5E7EB"
+        "primary": "#17a862",
+        "secondary": "#4a5568",
+        "accent": "#17a862",
+        "success": "#17a862",
+        "warning": "#b47a10",
+        "error": "#d1383d",
+        "info": "#4a5568",
+        "background": "#fafaf7",
+        "foreground": "#0a0a0a",
+        "muted": "#f4f3ef",
+        "border": "#e7e6e0"
       },
       "dark": {
-        "primary": "#60A5FA",
-        "secondary": "#A78BFA",
-        "accent": "#FBBF24",
-        "success": "#34D399",
-        "warning": "#FBBF24",
-        "error": "#F87171",
-        "info": "#60A5FA",
-        "background": "#111827",
-        "foreground": "#F9FAFB",
-        "muted": "#1F2937",
-        "border": "#374151"
+        "primary": "#3ecf8e",
+        "secondary": "#a1a1a1",
+        "accent": "#3ecf8e",
+        "success": "#3ecf8e",
+        "warning": "#f5a623",
+        "error": "#ff5c5c",
+        "info": "#61afef",
+        "background": "#0a0a0a",
+        "foreground": "#ededed",
+        "muted": "#161616",
+        "border": "#1f1f1f"
       }
     },
     "spacing": {
