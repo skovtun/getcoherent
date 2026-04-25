@@ -8,9 +8,9 @@
  * FALLBACK_CLI_VERSION on each CLI release so snapshots never look old.
  */
 
-export const FALLBACK_CLI_VERSION = '0.7.27'
+export const FALLBACK_CLI_VERSION = '0.11.0'
 export const FALLBACK_RELEASE_DATE = 'april 2026'
-export const FALLBACK_RELEASE_NAME = 'atmosphere engine'
+export const FALLBACK_RELEASE_NAME = 'rail parity'
 
 export function formatVersion(v: string): string {
   return v.startsWith('v') ? v : `v${v}`
