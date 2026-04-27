@@ -213,6 +213,32 @@ export const ERROR_CODES: ErrorCodeDoc[] = [
       { label: 'COHERENT_E006 (session artifact missing)', href: '/errors/E006' },
     ],
   },
+  {
+    code: 'COHERENT_E008',
+    slug: 'E008',
+    title: 'Project was created with an older Coherent version than the installed CLI',
+    description:
+      'The CLI\'s config schema, generator templates, and validator rules evolve across releases. A project initialized with an older CLI may have a config shape that the newer CLI\'s downstream code doesn\'t expect — e.g., a missing field on a page that the new generator dereferences. Pre-v0.13.1 the CLI printed a soft warning and continued, leading to cryptic generic `TypeError` mid-generation. v0.13.1 makes this a hard stop at config-load time so the actionable fix shows BEFORE any state mutation.',
+    whenYouSeeIt:
+      'Running `coherent chat "..."` on a project whose `design-system.config.ts` has a `coherentVersion` field older than the CLI you are running.',
+    why: 'A project on an older config schema cannot be reliably driven by a newer generator without first being migrated. The hard stop prevents partial-state corruption that the soft-warn path could create.',
+    fixes: [
+      {
+        label: 'Run `coherent update` in the project',
+        body: 'Applies the new CLI\'s rules and templates to your existing project without modifying your generated pages and components. Then re-run `coherent chat`.',
+        command: 'cd your-project && coherent update',
+      },
+      {
+        label: 'Pin your global CLI to the old version',
+        body: 'If you need to keep matching production parity with an older Coherent version, install the matching CLI globally instead of upgrading the project.',
+        command: 'npm install -g @getcoherent/cli@<old-version>',
+      },
+    ],
+    related: [
+      { label: 'COHERENT_E004 (protocol mismatch)', href: '/errors/E004' },
+      { label: 'COHERENT_E005 (session schema mismatch)', href: '/errors/E005' },
+    ],
+  },
 ]
 
 /** Look up a single code by slug (e.g. 'E001'). Returns null when not found. */
