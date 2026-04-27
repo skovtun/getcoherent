@@ -183,6 +183,36 @@ export const ERROR_CODES: ErrorCodeDoc[] = [
       { label: 'COHERENT_E005 (schema mismatch)', href: '/errors/E005' },
     ],
   },
+  {
+    code: 'COHERENT_E007',
+    slug: 'E007',
+    title: 'applyMode: no-new-ai received an AI-dependent request without pre-populated output',
+    description:
+      'The skill rail (`/coherent-chat` via Claude Code) and the API rail (`coherent chat`) share the same `applyRequests` entry point but run with different `applyMode` settings. API rail has an AI provider available and runs in `with-ai` mode — non-pre-populated AI requests are fine, the provider fills in the output mid-dispatch. Skill rail has NO provider and runs in `no-new-ai` mode — every AI-dependent request must arrive with its output already filled in by the upstream skill phase. Pre-v0.12.0 the skill rail silently dropped these requests; since v0.12.0 it throws E007 loudly so the producer-side bug surfaces immediately.',
+    whenYouSeeIt:
+      'Hitting `applyRequests` on the skill rail with a `ModificationRequest` whose type is AI-dependent (`add-page`, `update-page`, `modify-layout-block`, `link-shared`, `promote-and-link`) but the request did NOT carry pre-populated deterministic output (`changes.pageCode` for add/update-page, `changes.layoutBlock` for modify-layout-block).',
+    why: 'AI-dependent request types need either a model in the loop OR a producer phase that has already filled in the deterministic output. Skill rail has no model. If a request reaches `applyRequests` without pre-population, the producer phase upstream has a bug — the skill flow expected to fill in the output before emitting the request, and didn\'t.',
+    fixes: [
+      {
+        label: 'Re-run via the API rail',
+        body: 'The API rail has the provider available and handles AI-dependent requests directly. This is the fastest workaround when you hit E007 from a skill-rail invocation. File an issue afterward with the skill name + request type so the producer-side bug can be fixed.',
+        command: 'coherent chat "<your original request>"',
+      },
+      {
+        label: 'You called `applyRequests` directly from custom code',
+        body: 'Switch to `applyMode: \'with-ai\'` if you have a provider set up, or pre-populate the request\'s `changes.pageCode` / `changes.layoutBlock` field before calling `applyRequests`.',
+      },
+      {
+        label: 'The request type is `link-shared` or `promote-and-link`',
+        body: 'These cannot be pre-populated — they always require AI to pick the insertion site / extract the JSX. Use the API rail.',
+        command: 'coherent chat "<your request>"',
+      },
+    ],
+    related: [
+      { label: 'COHERENT_E001 (no API key)', href: '/errors/E001' },
+      { label: 'COHERENT_E006 (session artifact missing)', href: '/errors/E006' },
+    ],
+  },
 ]
 
 /** Look up a single code by slug (e.g. 'E001'). Returns null when not found. */
