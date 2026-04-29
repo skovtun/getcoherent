@@ -47,6 +47,14 @@ export const metadata: Metadata = {
     siteName: 'Coherent Design Method',
     title: 'Coherent Design Method — Once designed. Consistent UI everywhere.',
     description: 'Generate multi-page UI prototypes where every page shares the same components, colors, and layout. CLI for consistent design systems.',
+    images: [
+      {
+        url: '/og.png',
+        width: 1200,
+        height: 630,
+        alt: 'Coherent Design Method — Once designed. Consistent UI everywhere.',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
@@ -54,6 +62,7 @@ export const metadata: Metadata = {
     creator: '@uxui_dev',
     title: 'Coherent Design Method — Once designed. Consistent UI everywhere.',
     description: 'Generate multi-page UI prototypes where every page shares the same components and layout. CLI for consistent design systems.',
+    images: ['/og.png'],
   },
   robots: {
     index: true,
