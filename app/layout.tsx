@@ -15,7 +15,10 @@ const geistMono = Geist_Mono({
   subsets: ['latin'],
 })
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://getcoherent.design'
+// Use www subdomain to match Vercel's canonical redirect target.
+// Bare-domain → 307 → www breaks og:image / twitter:image fetches because
+// many social scrapers (X, LinkedIn) don't follow redirects on image URLs.
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.getcoherent.design'
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
