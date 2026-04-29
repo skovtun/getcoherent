@@ -1,6 +1,8 @@
 import { ImageResponse } from 'next/og'
 
-export const runtime = 'edge'
+// Removed `runtime: 'edge'` — Next 15 edge runtime was returning empty
+// content-length: 0 PNG for this route, breaking all social previews.
+// Default Node serverless runtime is slightly slower but actually renders.
 export const alt = 'Coherent Design Method — Once designed. Consistent UI everywhere.'
 export const size = { width: 1200, height: 630 }
 export const contentType = 'image/png'
