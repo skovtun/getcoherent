@@ -1695,8 +1695,8 @@ const PRICING = [
       'Everything. No paid tier, no gated features, no usage limits. You bring your own LLM key.',
     features: [
       'Unlimited projects',
-      'All 5 atmospheres (Console, Warm, Editorial, Minimal, Bold + your own)',
-      '23 enforced rules + auto-fix',
+      'All 10 atmospheres (Swiss Grid, Paper Editorial, Neo-Brutalist, Dark Terminal, Obsidian Neon, Premium-Focused, Warm Industrial, Solar SaaS, Wabi-Sabi, Luxury Editorial + your own)',
+      '38+ validators with auto-fix',
       'Shared components registry',
       'Built-in rule & golden-pattern library',
       'Works with Cursor, Claude Code, any AI editor',
