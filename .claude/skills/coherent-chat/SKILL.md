@@ -1,0 +1,382 @@
+---
+name: coherent-chat
+description: Generate and modify Coherent Design Method Next.js UIs by driving the Coherent CLI phase rail. Use in a Coherent project when asked to build, generate, add, update, or remove pages/components without a direct API key.
+license: MIT
+compatibility: Requires coherent CLI on PATH, Node 18+, filesystem read/write, shell or terminal execution, and a Coherent project root. Optimized for Claude Code; portable to other agents that follow the agentskills.io standard with equivalent shell/file tools.
+metadata:
+  coherent_phase_engine_protocol: "2"
+---
+
+# coherent-chat — skill-mode orchestrator
+
+Drives Coherent's v0.9.0 phase rail via the `coherent` CLI, one phase at a
+time. Responses come from THIS model session; the CLI never calls an AI API
+under this skill.
+
+**Protocol version: 2.** Every `coherent _phase ...`
+invocation below passes `--protocol 2` so CLI/markdown
+drift is caught at the first ingest, not silently halfway through a run.
+
+## When to invoke
+
+- User asks to build, generate, scaffold, or add pages/components/a project
+- Working directory has `design-system.config.ts` (Coherent project root)
+- API-key-less flow: no `ANTHROPIC_API_KEY` / `OPENAI_API_KEY` configured
+
+If the user ran `coherent init --api-mode` or has an API key, prefer
+`coherent chat "<request>"` (the single-shot in-process rail).
+
+## Flow
+
+The flow is **dynamic** — phases are gated by `session-shape.json` written by the plan phase. After plan ingest, read `session-shape.json` and follow only the phases listed in `shape.phases`.
+
+Two common shapes:
+
+```
+Plan-only (delete-page, update-token, add-component, etc.):
+  session start → plan → session end                          (2 steps)
+
+Full add-page generation:
+  session start → plan → anchor → extract-style → components
+                       → page × N → session end → coherent fix (8 steps)
+```
+
+A rename like "rename Transactions to Activity" decomposes into `[delete-page X, add-page Y]` and uses the FULL flow because of the add-page. A pure `[delete-page X]` uses the plan-only flow and skips anchor / extract-style / components / page entirely.
+
+## Response format per phase (read once, follow exactly)
+
+Each phase's prompt file describes the schema in detail; the rules below are the cross-phase summary.
+
+- **Plan, components** — plain JSON. Match the schema printed in the prompt verbatim.
+- **Anchor, page** — JSON header followed by a ```tsx fenced block. NO `pageCode` string in the JSON. The TSX is read VERBATIM by the CLI parser — no escaping needed.
+
+Anchor and page response shape:
+
+```
+{
+  "type": "add-page",
+  "target": "new",
+  "changes": {
+    "id": "balance",
+    "name": "Balance",
+    "route": "/balance",
+    "layout": "centered",
+    ...
+  }
+}
+
+```tsx
+import { Card } from "@/components/ui/card"
+export default function BalancePage() {
+  return <div className="space-y-6">...</div>
+}
+```
+```
+
+DO NOT put `pageCode` inside the JSON. Embedded backticks inside template literals or JSX are fine — only a fence-only line at the very end closes the block. This format kills the JSON-escape failure class on long pageCode (M14, PHASE_ENGINE_PROTOCOL=2).
+
+## Skip sentinel
+
+When a `prep` Bash output is exactly `__COHERENT_PHASE_SKIPPED__` (one line, optional trailing newline), the phase has no AI work to do — it already wrote its output artifact deterministically. **Do NOT Write a response file. Do NOT call `_phase ingest` for that phase.** Move on to the next step.
+
+Common cases (v0.11.4):
+- **Components** when the plan has zero shared components.
+- **Anchor** when the plan has no `add-page` request (plan-only flows).
+- **Components** when extract-style was skipped (no `components-input.json` to read).
+
+If you forget to skip and call `_phase ingest` after a sentinel, ingest also no-ops gracefully — but you'll have wasted a Write+Bash turn.
+
+## Progress reporting
+
+Do NOT print intermediate progress lines (no `▸ [N/M]` counters, no "Planning…", no "Applying to disk…"). The Bash boxes themselves show what's running; extra commentary creates noise. Save your output for the final completion card (see "Completion signal" below).
+
+## How to invoke each Bash call (read this once, applies to every step)
+
+Each Bash tool call is its own subshell, and Claude Code's permission rule for this skill is exactly `Bash(coherent *)` — i.e., the call passes silently only when the FIRST and ONLY command is a literal `coherent ...` invocation. **Anything that introduces a second command triggers a yes/no permission gate**, which is why "still many confirmations" used to happen even after the rename.
+
+Concrete rules:
+
+- **No pipes.** Never write `coherent ... | wc -l`, `coherent ... | head`, `coherent ... | grep ...`. The pipe target is a separate command and gets gated.
+- **No chains.** Never use `&&`, `||`, or `;` to chain anything after a coherent call. Same reason.
+- **No env prefix.** Never write `UUID=$(coherent session start ...)` or `UUID=x coherent ...`. The leading `UUID=...` makes the command not start with `coherent`.
+- **No debug echo.** No `coherent ...; echo "exit: $?"` — exit code is reported through your own tool result, you don't need to echo it.
+- **Inspect files with the Read tool, not Bash.** If you want to see how big a prompt file is, what's in plan.json, or whether an artifact got written — use Read or list_files. Never `cat`, `wc`, or `ls` via Bash for these.
+- **Substitute the UUID literally** into every command. The UUID was printed by step 1; paste it directly. Each Bash call must START with the literal token `coherent`.
+
+In the snippets below, `<UUID>` is a placeholder — replace it with the actual UUID printed by step 1.
+
+If a Bash call legitimately fails (CLI returned non-zero), the tool result already includes the stderr — you don't need to redirect or echo. Read the result, fix the response file, retry.
+
+## Steps
+
+### 1. Start the session
+
+```bash
+coherent session start --intent "<user request verbatim>" --quiet
+```
+
+The command prints the session UUID (one line) to stdout. Capture it. Use that literal UUID in every subsequent command — do NOT prefix calls with `UUID=...` and do NOT pipe the output to anything. `--quiet` strips the informational stderr block so the Bash box stays tight.
+
+### 2. Plan phase (AI)
+
+```bash
+coherent _phase prep plan --session <UUID> --protocol 2 > .coherent/session/<UUID>/plan-prompt.md
+```
+
+Read `.coherent/session/<UUID>/plan-prompt.md`. Produce the plan JSON response (match the
+schema in the prompt exactly). Write to `.coherent/session/<UUID>/plan-response.md`. Then:
+
+```bash
+coherent _phase ingest plan --session <UUID> --protocol 2 < .coherent/session/<UUID>/plan-response.md
+```
+
+### 2.5. Read the session shape (gates everything below)
+
+Read `.coherent/session/<UUID>/session-shape.json` with the Read tool. The plan ingest wrote it. Shape fields:
+
+- `phases: string[]` — ordered list of phases this session needs, e.g. `["plan", "apply"]` or `["plan", "anchor", "extract-style", "components", "page", "apply"]`. Use `phases.length` for the `[N/M]` counter total.
+- `hasAddPage: boolean` — when `false`, **skip steps 3–6 entirely** (anchor, extract-style, components, page). Jump to step 7.
+- `hasOnlyNoAiRequests: boolean` — when `true`, fast path. The modification applier handles delete-page / delete-component / update-token / add-component / modify-component deterministically at session end. No AI generation needed.
+- `needsFix: boolean` — when `false`, **skip step 8** (`coherent fix`). For plan-only ops it's noisy and risks mutating unrelated state.
+
+If the shape file is missing (older CLI), default to `hasAddPage: true` + `needsFix: true` and run all steps as before.
+
+### 3. Anchor phase (AI) — only if `shape.hasAddPage`
+
+Run prep first:
+
+```bash
+coherent _phase prep anchor --session <UUID> --protocol 2 > .coherent/session/<UUID>/anchor-prompt.md
+```
+
+Read `.coherent/session/<UUID>/anchor-prompt.md`, produce the JSON response
+(the schema is in the prompt), Write it to
+`.coherent/session/<UUID>/anchor-response.md`. Then ingest in a SEPARATE Bash call:
+
+```bash
+coherent _phase ingest anchor --session <UUID> --protocol 2 < .coherent/session/<UUID>/anchor-response.md
+```
+
+### 4. Extract-style phase (deterministic) — only if `shape.hasAddPage`
+
+No AI call — pure transform over the anchor artifact:
+
+```bash
+coherent _phase run extract-style --session <UUID> --protocol 2
+```
+
+### 5. Components phase (AI) — only if `shape.hasAddPage`
+
+```bash
+coherent _phase prep components --session <UUID> --protocol 2 > .coherent/session/<UUID>/components-prompt.md
+```
+
+Read the prompt, Write the response file, then ingest in a SEPARATE Bash call:
+
+```bash
+coherent _phase ingest components --session <UUID> --protocol 2 < .coherent/session/<UUID>/components-response.md
+```
+
+### 6. Page phase (AI, parallel per page) — only if `shape.hasAddPage` AND `pages-input.json` exists with non-empty `pages[]`
+
+**Skip rule (v0.13.10):** When the plan contained ONLY the anchor page (1 add-page total), `pages-input.json` is either absent OR has empty `pages[]`. The anchor was generated in step 3 — there is nothing left to generate per-page. Do NOT run `coherent _phase prep page:<id>` in this case; it will fail with `missing required artifact "pages-input.json"`. Move directly to step 7.
+
+When `pages-input.json` exists with non-empty `pages[]` (multi-page plans only), read it and run page phase for every `pageId` in `pages[].id`. The first page in `plan.pageNames` is the anchor — generated in step 3 — so `pages-input.json` deliberately does NOT include it.
+
+**Run pages in parallel.** Pages are independent after extract-style. Issue
+calls in 3 batches of N parallel tool calls per message (cap at 6 per batch
+for very wide plans):
+
+- **Batch 1 — parallel prep:** one message, N parallel Bash calls, one per
+  page id, each writing to `page-<id>-prompt.md`.
+- **Batch 2 — parallel response writes:** read each prompt file, generate
+  the response (JSON header + ```tsx fence per the format spec above),
+  Write each `page-<id>-response.md`. One message, N parallel Write calls.
+- **Batch 3 — parallel ingest:** one message, N parallel Bash calls, each
+  piping its `page-<id>-response.md` into `coherent _phase ingest
+  page:<id>`.
+
+Example Bash calls within batches (substitute literal page id, e.g. `page:balance`):
+
+```bash
+coherent _phase prep page:<pageId> --session <UUID> --protocol 2 > .coherent/session/<UUID>/page-<pageId>-prompt.md
+```
+
+```bash
+coherent _phase ingest page:<pageId> --session <UUID> --protocol 2 < .coherent/session/<UUID>/page-<pageId>-response.md
+```
+
+This collapses 12 sequential turns (4 pages × 3 steps) into 3 parallel batches.
+
+### 7. End the session
+
+```bash
+coherent session end <UUID> --quiet
+```
+
+Applies all artifacts in order: config-delta → modification → components → pages → replace-welcome → layout → fix-globals-css. Writes the run record under `.coherent/runs/`, releases the project lock. With `--quiet` the output is a one-line summary (`✔ Session <short> ended (<N> applied)`) instead of the verbose `Applied:` block. Read `.coherent/runs/<latest>.yaml` if you need details for the completion card.
+
+### 8. Run `coherent fix` — only if `shape.needsFix`
+
+```bash
+coherent fix
+```
+
+When generated pages or shared components landed in step 6/7, they often import shadcn primitives (`@/components/ui/badge`, `tabs`, `select`, etc.) that the user's project doesn't yet have. `coherent fix` auto-installs them and runs cleanup. Without this step, `coherent preview` would throw `Module not found` on first open.
+
+For plan-only sessions (delete-page, update-token, etc.) `needsFix` is `false` — `coherent fix` is noisy and risks mutating unrelated state. Skip it.
+
+## Completion signal
+
+After step 7 (and step 8 when `needsFix`), print ONE final card. Plain text, no backticks anywhere — Claude Code renders inline code as gray-on-light text and the contrast collapses to unreadable on highlighted plates. Format:
+
+```
+Coherent · <intent verbatim>
+
+  ✅ Applied: <one-line summary>
+
+  📍 <discoverability hint — ONLY when new pages were added; see classification below>
+
+  Preview · coherent preview (or open localhost:3000 if already running)
+  Undo    · coherent undo
+  Debug   · session <short-uuid> (full uuid: <full-uuid>)
+```
+
+The `<one-line summary>` is condensed from the `session end` output. With `session end --quiet` you get only `✔ Session <short> ended (<N> applied)` — read `.coherent/runs/<latest>.yaml` if you need detail.
+
+### Discoverability hint (📍 line)
+
+When `add-page` requests landed, the new page exists at its route but **nothing links to it yet** — the user has to know the URL. Without a hint, they get stuck. Classify each new page and emit ONE concrete next-step suggestion.
+
+**Classification (apply in order, first match wins):**
+
+1. **DETAIL** — route contains a Next.js dynamic segment (`[id]`, `[slug]`, `[...slug]`). Examples: `/users/[id]`, `/tasks/[id]`, `/blog/[slug]`.
+2. **INTERNAL** — route has 2+ path segments AND parent route exists (e.g. `/settings/billing` when `/settings` is already a registered page). Sub-page of an existing parent.
+3. **TOP-LEVEL** — single-segment route (`/profile`, `/pricing`) OR name matches a known top-level pattern: settings, profile, dashboard, pricing, features, contact, about, blog index, faq.
+
+If multiple new pages added in one run, emit hint for the **anchor page** (or first by plan order). Skip the 📍 line entirely if:
+- No `add-page` in applied (delete-page, update-token, modify-component, etc.)
+- The user's intent already specifies linking (`"add a Profile page linked from /home"`, etc.)
+
+**Templates per classification:**
+
+TOP-LEVEL:
+```
+  📍 <PageName> looks like a top-level page. To add it to the main nav:
+     coherent chat "add <PageName> to the main nav"
+```
+
+INTERNAL (parent = parent route):
+```
+  📍 <PageName> looks like a sub-page of <parent>. To wire it up:
+     coherent chat "add a <PageName> link to the <parent> page"
+```
+
+DETAIL (parent-list = inferred list page from route prefix):
+```
+  📍 <PageName> is a dynamic [id] detail route. To make it reachable:
+     coherent chat "in <parent-list>, make each item's name link to <route>"
+```
+
+### Examples
+
+Plan-only delete (no 📍 line):
+
+```
+Coherent · delete the Activity page
+
+  ✅ Applied: delete-page Profile
+
+  Preview · coherent preview (or open localhost:3000 if already running)
+  Undo    · coherent undo
+  Debug   · session 4f2adb (full uuid: 4f2adb4a-bec4-4760-a5b5-e67e1bc447b7)
+```
+
+Top-level page added:
+
+```
+Coherent · add a profile page
+
+  ✅ Applied: 1 page (Profile) at /profile
+
+  📍 Profile looks like a top-level page. To add it to the main nav:
+     coherent chat "add Profile to the main nav"
+
+  Preview · coherent preview (or open localhost:3000 if already running)
+  Undo    · coherent undo
+  Debug   · session 4f2adb (full uuid: 4f2adb4a-bec4-4760-a5b5-e67e1bc447b7)
+```
+
+Internal sub-page added:
+
+```
+Coherent · add a billing settings page
+
+  ✅ Applied: 1 page (BillingSettings) at /settings/billing
+
+  📍 BillingSettings looks like a sub-page of /settings. To wire it up:
+     coherent chat "add a BillingSettings link to the /settings page"
+
+  Preview · coherent preview (or open localhost:3000 if already running)
+  Undo    · coherent undo
+  Debug   · session 4f2adb (full uuid: 4f2adb4a-bec4-4760-a5b5-e67e1bc447b7)
+```
+
+Detail page added:
+
+```
+Coherent · add a user detail page
+
+  ✅ Applied: 1 page (UserDetail) at /users/[id]
+
+  📍 UserDetail is a dynamic [id] detail route. To make it reachable:
+     coherent chat "in /users, make each user's name link to /users/[id]"
+
+  Preview · coherent preview (or open localhost:3000 if already running)
+  Undo    · coherent undo
+  Debug   · session 4f2adb (full uuid: 4f2adb4a-bec4-4760-a5b5-e67e1bc447b7)
+```
+
+Multi-page generation — emit hint for anchor only:
+
+```
+Coherent · build a fitness studio app
+
+  ✅ Applied: 4 pages, 2 components, layout regen
+
+  📍 Classes (anchor page) is top-level. The full nav is regenerated automatically for multi-page builds — no follow-up needed.
+
+  Preview · coherent preview (or open localhost:3000 if already running)
+  Undo    · coherent undo
+  Debug   · session 4f2adb (full uuid: 4f2adb4a-bec4-4760-a5b5-e67e1bc447b7)
+```
+
+If `session end` errored (non-zero exit) — replace the success block with the error and skip Preview/Undo + 📍:
+
+```
+Coherent · <intent>
+
+  ❌ Failed: <error message verbatim>
+
+  Project unchanged. See .coherent/session/<UUID>/ for state.
+  Debug · session <short-uuid> (full uuid: <full-uuid>)
+```
+
+## Error recovery
+
+- Any step fails: the session dir under `.coherent/session/<UUID>/` stays
+  intact for post-mortem. Re-run the failing step after producing a
+  corrected response, or `coherent session end <UUID> --keep` to bail
+  while preserving state.
+- `Protocol mismatch`: the CLI's `PHASE_ENGINE_PROTOCOL` differs from
+  what this skill was written for. Upgrade one side before retrying.
+- `ingest: empty stdin`: your response file is empty or whitespace-only.
+  Regenerate and re-pipe.
+
+## Response quality
+
+Every AI phase's prompt contains the Coherent constraint bundle (design
+thinking, core constraints, quality rules, contextual rules, golden
+patterns, atmosphere directive). Follow them literally — the CLI's
+validator rejects raw Tailwind colors, undersized tap targets, and other
+anti-patterns on `session end`, and the page will be regenerated.

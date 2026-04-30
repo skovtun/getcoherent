@@ -2,6 +2,25 @@
 
 This is a Coherent Design Method project — AI-powered multi-page UI prototype with shared component system.
 
+## Skill routing (READ FIRST)
+
+When the user asks to **create, generate, add, or build** pages / components / a multi-page
+app / UI from a natural-language description — **invoke the `/coherent-chat` skill**.
+
+`/coherent-chat` runs the Coherent phase engine: plan → anchor → extract-style → components → pages,
+with shared-component reuse, per-page design constraints, and a validator/auto-fix pass at the
+end. Going direct with Write / Edit skips all of that — your pages will look internally OK but
+will drift from Header/Footer, the landing, the design tokens, and the navigation manifest.
+
+**Always `/coherent-chat`:** new pages, new components, "create an app with N pages",
+regenerations, whole-theme rewrites, changing the design system.
+
+**Never `/coherent-chat` (just edit directly):** typo fixes, copy tweaks in one file, adding
+an import, refactoring a single function, debugging a runtime error, reading code.
+
+If in doubt, prefer `/coherent-chat` — wasted skill invocation is cheap; silently bypassing
+the phase engine is not (landing stays stale, shared components drift, no consistency check).
+
 ## Architecture
 
 - app/ — Next.js App Router pages
@@ -71,6 +90,19 @@ Before creating ANY UI block, check if a shared component exists above. If yes �
 - Animation: transition-colors for hovers, 150ms. NEVER page load animations
 - Accessibility: WCAG 2.2 AA, contrast ≥ 4.5:1, touch targets ≥ 44px, focus-visible on all interactive
 - Auth pages (login, signup, etc.) go in app/(auth)/ route group — no Header/Footer
+
+## Design Tokens
+
+Current design tokens:
+- Primary: #17a862
+- Background: #fafaf7
+- Foreground: #0a0a0a
+- Muted: #f4f3ef
+- Border: #e7e6e0
+- Radius: 0.5rem
+
+Use semantic token classes (bg-background, text-foreground, bg-primary, etc.).
+NEVER hardcode colors. NEVER use arbitrary Tailwind values like bg-[#123456].
 
 ## After Making Changes
 

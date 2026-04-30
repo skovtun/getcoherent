@@ -6,8 +6,9 @@
  */
 
 export const config = {
+  "provider": "shadcn",
   "version": "1.0.0",
-  "coherentVersion": "0.1.0",
+  "coherentVersion": "0.17.5",
   "frameworkVersions": {
     "next": "15.2.4",
     "react": "18.3.1",
@@ -206,6 +207,129 @@ export const config = {
       "usedInPages": [],
       "createdAt": "2026-03-08T07:30:28.242Z",
       "updatedAt": "2026-03-08T07:30:28.242Z"
+    },
+    {
+      "id": "avatar",
+      "name": "Avatar",
+      "category": "data-display",
+      "source": "custom",
+      "baseClassName": "relative flex shrink-0 overflow-hidden rounded-full bg-muted",
+      "variants": [],
+      "sizes": [
+        {
+          "name": "xs",
+          "className": "size-6 text-xs"
+        },
+        {
+          "name": "sm",
+          "className": "size-8 text-xs"
+        },
+        {
+          "name": "md",
+          "className": "size-10 text-sm"
+        },
+        {
+          "name": "lg",
+          "className": "size-12 text-base"
+        },
+        {
+          "name": "xl",
+          "className": "size-14 text-lg"
+        }
+      ],
+      "usedInPages": [],
+      "createdAt": "2026-04-29T00:00:00.000Z",
+      "updatedAt": "2026-04-29T00:00:00.000Z"
+    },
+    {
+      "id": "input",
+      "name": "Input",
+      "category": "form",
+      "source": "custom",
+      "baseClassName": "flex w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+      "variants": [],
+      "sizes": [
+        {
+          "name": "sm",
+          "className": "h-8 text-xs"
+        },
+        {
+          "name": "md",
+          "className": "h-9 text-sm"
+        },
+        {
+          "name": "lg",
+          "className": "h-10 text-base"
+        }
+      ],
+      "usedInPages": [],
+      "createdAt": "2026-04-29T00:00:00.000Z",
+      "updatedAt": "2026-04-29T00:00:00.000Z"
+    },
+    {
+      "id": "label",
+      "name": "Label",
+      "category": "form",
+      "source": "custom",
+      "baseClassName": "text-sm font-medium leading-none text-foreground",
+      "variants": [],
+      "sizes": [],
+      "usedInPages": [],
+      "createdAt": "2026-04-29T00:00:00.000Z",
+      "updatedAt": "2026-04-29T00:00:00.000Z"
+    },
+    {
+      "id": "alert",
+      "name": "Alert",
+      "category": "feedback",
+      "source": "custom",
+      "baseClassName": "relative w-full rounded-lg border px-4 py-3 text-sm",
+      "variants": [
+        {
+          "name": "default",
+          "className": "bg-background text-foreground border-border"
+        },
+        {
+          "name": "destructive",
+          "className": "border-destructive/50 text-destructive"
+        },
+        {
+          "name": "success",
+          "className": "border-success/50 text-success"
+        },
+        {
+          "name": "warning",
+          "className": "border-warning/50 text-warning"
+        }
+      ],
+      "sizes": [],
+      "usedInPages": [],
+      "createdAt": "2026-04-29T00:00:00.000Z",
+      "updatedAt": "2026-04-29T00:00:00.000Z"
+    },
+    {
+      "id": "skeleton",
+      "name": "Skeleton",
+      "category": "feedback",
+      "source": "custom",
+      "baseClassName": "animate-pulse rounded-md bg-muted",
+      "variants": [],
+      "sizes": [],
+      "usedInPages": [],
+      "createdAt": "2026-04-29T00:00:00.000Z",
+      "updatedAt": "2026-04-29T00:00:00.000Z"
+    },
+    {
+      "id": "progress",
+      "name": "Progress",
+      "category": "feedback",
+      "source": "custom",
+      "baseClassName": "relative h-2 w-full overflow-hidden rounded-full bg-muted",
+      "variants": [],
+      "sizes": [],
+      "usedInPages": [],
+      "createdAt": "2026-04-29T00:00:00.000Z",
+      "updatedAt": "2026-04-29T00:00:00.000Z"
     }
   ],
   "layoutBlocks": [],
@@ -290,11 +414,13 @@ export const config = {
     }
   },
   "settings": {
+    "initialized": true,
     "appType": "multi-page",
     "framework": "next",
     "typescript": true,
     "cssFramework": "tailwind",
-    "autoScaffold": true
+    "autoScaffold": true,
+    "homePagePlaceholder": false
   },
   "createdAt": "2026-03-08T07:26:36.623Z",
   "updatedAt": "2026-03-10T03:15:58.205Z"
