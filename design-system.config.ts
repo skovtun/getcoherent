@@ -8,7 +8,7 @@
 export const config = {
   "provider": "shadcn",
   "version": "1.0.0",
-  "coherentVersion": "0.17.15",
+  "coherentVersion": "0.17.16",
   "frameworkVersions": {
     "next": "15.2.4",
     "react": "18.3.1",
